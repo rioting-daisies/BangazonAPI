@@ -29,7 +29,7 @@ namespace BangazonAPI.Controllers
             }
         }
 
-        // GET: api/ProductType
+        // GET All Product Type Entries
         [HttpGet]
         public async Task<IActionResult> Get()
         {
@@ -58,8 +58,8 @@ namespace BangazonAPI.Controllers
             }
         }
 
-        // GET: api/ProductType/5
-        [HttpGet("{id}")]
+        // GET One Product Type Entry
+        [HttpGet("{id}", Name = "GetProductType")]
         //[HttpGet("{id}", Name = "Get")]
         public async Task<IActionResult> Get(int id)
         {
@@ -83,7 +83,7 @@ namespace BangazonAPI.Controllers
                         productType = new ProductType()
                         {
                             Id = reader.GetInt32(reader.GetOrdinal("Id")),                            
-                            Name = reader.GetString(reader.GetOrdinal("Name"))                            
+                            Name = reader.GetString(reader.GetOrdinal("Name"))
                         };
                     }
                     reader.Close();
@@ -92,24 +92,100 @@ namespace BangazonAPI.Controllers
             }
         }
 
-        // POST: api/ProductType
+        // POST Product Type Entry
         [HttpPost]
-        public void Post([FromBody] string value)
+        public async Task<IActionResult> Post([FromBody] ProductType productType)
         {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"INSERT INTO ProductType (Name)
+                                      Output INSERTED.Id
+                                      VALUES (@name)";
+                    cmd.Parameters.Add(new SqlParameter("@name", productType.Name));
+
+                    int NewId = (int)await cmd.ExecuteScalarAsync();
+                    productType.Id = NewId;
+                    return CreatedAtRoute("GetProductType", new { id = NewId }, productType);
+                }
+            }
         }
 
-        // PUT: api/ProductType/5
+        // PUT (update) Product Type Entry
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public async Task<IActionResult> Put([FromRoute] int id, [FromBody] ProductType productType)
         {
-        }
+            try
+            {
+                using (SqlConnection conn = Connection)
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = @"UPDATE ProductType
+                                            SET Name = @name                          
+                                            WHERE Id = @id";
+                        cmd.Parameters.Add(new SqlParameter("@name", productType.Name));
+                        cmd.Parameters.Add(new SqlParameter("@id", id));
 
-        // DELETE: api/ApiWithActions/5
+                        int rowsAffected = await cmd.ExecuteNonQueryAsync();
+                        if (rowsAffected > 0)
+                        {
+                            return new StatusCodeResult(StatusCodes.Status204NoContent);
+                        }
+                        throw new Exception("No rows affected");
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                if (!ProductTypeExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+        }
+        // DELETE Product Type Entry
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public async Task<IActionResult> Delete([FromRoute] int id)
         {
-        }
+            try
+            {
+                using (SqlConnection conn = Connection)
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = @"DELETE FROM ProductType WHERE Id = @id";
+                        cmd.Parameters.Add(new SqlParameter("@id", id));
 
+                        int rowsAffected = await cmd.ExecuteNonQueryAsync();
+                        if (rowsAffected > 0)
+                        {
+                            return new StatusCodeResult(StatusCodes.Status204NoContent);
+                        }
+                        throw new Exception("No rows affected");
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                if (!ProductTypeExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+        }
         private bool ProductTypeExists(int id)
         {
             using (SqlConnection conn = Connection)
