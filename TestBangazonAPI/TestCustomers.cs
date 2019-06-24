@@ -98,5 +98,17 @@ namespace TestBangazonAPI
                 Assert.Equal(HttpStatusCode.NoContent, deleteResponse.StatusCode);
             }
         }
+
+        [Fact]
+        public async Task Test_Delete_NonExistent_Customer_Fails()
+        {
+            using (var client = new APIClientProvider().Client)
+            {
+                var deleteResponse = await client.DeleteAsync("/api/Customer/600000");
+
+                Assert.False(deleteResponse.IsSuccessStatusCode);
+                Assert.Equal(HttpStatusCode.NotFound, deleteResponse.StatusCode);
+            }
+        }
     }
 }
