@@ -53,5 +53,16 @@ namespace TestBangazonAPI
                 Assert.NotNull(customer);
             }
         }
+
+        [Fact]
+        public async Task Test_Get_NonExistant_Customer_Fails()
+        {
+
+            using (var client = new APIClientProvider().Client)
+            {
+                var response = await client.GetAsync("/Customer/999999999");
+                Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+            }
+        }
     }
 }
