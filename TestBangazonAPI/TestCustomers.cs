@@ -5,6 +5,8 @@ using Xunit;
 using BangazonAPI.Models;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Net.Http;
+using System.Text;
 
 namespace TestBangazonAPI
 {
@@ -62,6 +64,38 @@ namespace TestBangazonAPI
             {
                 var response = await client.GetAsync("/Customer/999999999");
                 Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+            }
+        }
+
+        [Fact]
+        public async Task Test_Create_And_Delete_Customer()
+        {
+            using (var client = new APIClientProvider().Client)
+            {
+                Customer helen = new Customer
+                {
+                    FirstName = "Helen",
+                    LastName = "Chalmers"
+                };
+                var helenAsJSON = JsonConvert.SerializeObject(helen);
+
+
+                var response = await client.PostAsync(
+                    "api/Customer",
+                    new StringContent(helenAsJSON, Encoding.UTF8, "application/json")
+                );
+
+
+                string responseBody = await response.Content.ReadAsStringAsync();
+                var newHelen = JsonConvert.DeserializeObject<Customer>(responseBody);
+
+                Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+                Assert.Equal("Helen", newHelen.FirstName);
+                Assert.Equal("Chalmers", newHelen.LastName);
+
+
+                var deleteResponse = await client.DeleteAsync($"api/Customer/{newHelen.Id}");
+                Assert.Equal(HttpStatusCode.NoContent, deleteResponse.StatusCode);
             }
         }
     }
