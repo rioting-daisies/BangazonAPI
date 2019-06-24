@@ -70,12 +70,14 @@ namespace BangazonAPI.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
+            string sql = @"SELECT c.Id AS CustomerId, c.FirstName, c.LastName FROM Customer c";
+
             using (SqlConnection conn = Connection)
             {
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = "Write your SQL statement here to get a single customer";
+                    cmd.CommandText = sql;
                     cmd.Parameters.Add(new SqlParameter("@id", id));
                     SqlDataReader reader = await cmd.ExecuteReaderAsync();
 
@@ -84,7 +86,7 @@ namespace BangazonAPI.Controllers
                     {
                         customer = new Customer
                         {
-                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            Id = reader.GetInt32(reader.GetOrdinal("CustomerId")),
                             FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
                             LastName = reader.GetString(reader.GetOrdinal("LastName")),
                             // You might have more columns
@@ -109,15 +111,16 @@ namespace BangazonAPI.Controllers
                 {
                     // More string interpolation
                     cmd.CommandText = @"
-                        INSERT INTO Customer ()
+                        INSERT INTO Customer (FirstName, LastName)
                         OUTPUT INSERTED.Id
-                        VALUES ()
+                        VALUES (@FirstName, @LastName)
                     ";
-                    cmd.Parameters.Add(new SqlParameter("@firstName", customer.FirstName));
+                    cmd.Parameters.Add(new SqlParameter("@FirstName", customer.FirstName));
+                    cmd.Parameters.Add(new SqlParameter("@LastName", customer.LastName));
 
                     customer.Id = (int)await cmd.ExecuteScalarAsync();
 
-                    return CreatedAtRoute("GetCustomer", new { id = customer.Id }, customer);
+                    return CreatedAtAction("Get", new { id = customer.Id }, customer);
                 }
             }
         }
