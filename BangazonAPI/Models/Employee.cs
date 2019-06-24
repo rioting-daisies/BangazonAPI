@@ -6,16 +6,20 @@ using System.Threading.Tasks;
 
 namespace BangazonAPI.Models
 {
-    public class TrainingProgram
+    public class Employee
     {
         public int Id { get; set; }
+
         [Required]
-        public string Name { get; set; }
+        public string FirstName { get; set; }
+
         [Required]
-        public DateTime StartDate { get; set; }
+        public string LastName { get; set; }
+
         [Required]
-        public DateTime EndDate { get; set; }
+        public int DepartmentId { get; set; }
+
         [Required]
-        public int MaxAttendees { get; set; }
+        public bool IsSuperVisor { get; set; }
     }
 }
