@@ -121,7 +121,7 @@ namespace BangazonAPI.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT Id, AcctNumber, Name, CustomerId From PaymentType where Id = @id";
+                    cmd.CommandText = @"SELECT Id From PaymentType where Id = @id";
                     cmd.Parameters.Add(new SqlParameter("@id", id));
 
                     SqlDataReader reader = cmd.ExecuteReader();
