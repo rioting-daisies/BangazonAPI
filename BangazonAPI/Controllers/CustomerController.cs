@@ -68,9 +68,9 @@ namespace BangazonAPI.Controllers
 
         // GET api/values/5
         [HttpGet("{id}")]
-        public async Task<IActionResult> Get(int id)
+        public async Task<IActionResult> Get([FromRoute]int id)
         {
-            string sql = @"SELECT c.Id AS CustomerId, c.FirstName, c.LastName FROM Customer c";
+            string sql = @"SELECT c.Id AS CustomerId, c.FirstName, c.LastName FROM Customer c WHERE c.Id = @id";
 
             using (SqlConnection conn = Connection)
             {
@@ -127,7 +127,7 @@ namespace BangazonAPI.Controllers
 
         // PUT api/values/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, [FromBody] Customer customer)
+        public async Task<IActionResult> Put([FromRoute]int id, [FromBody] Customer customer)
         {
             try
             {
@@ -138,12 +138,13 @@ namespace BangazonAPI.Controllers
                     {
                         cmd.CommandText = @"
                             UPDATE Customer
-                            SET FirstName = @firstName
-                            -- Set the remaining columns here
+                            SET FirstName = @FirstName,
+                                LastName = @LastName
                             WHERE Id = @id
                         ";
-                        cmd.Parameters.Add(new SqlParameter("@id", customer.Id));
-                        cmd.Parameters.Add(new SqlParameter("@firstName", customer.FirstName));
+                        cmd.Parameters.Add(new SqlParameter("@id", id));
+                        cmd.Parameters.Add(new SqlParameter("@FirstName", customer.FirstName));
+                        cmd.Parameters.Add(new SqlParameter("@LastName", customer.LastName));
 
                         int rowsAffected = await cmd.ExecuteNonQueryAsync();
 
