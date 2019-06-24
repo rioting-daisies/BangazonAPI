@@ -9,6 +9,16 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 
+//User should be able to GET a list of customers, and GET a single customer.
+
+//If the query string parameter of? _include = products is provided, then any products that the customer is selling should be included in the response.
+
+//If the query string parameter of? _include = payments is provided, then any payment types that the customer has used to pay for an order should be included in the response.
+
+//If the query string parameter of q is provided when querying the list of customers, then any customer that has property value that matches the pattern should be returned.
+
+//If /customers? q = mic is requested, then any customer whose first name is Michelle, or Michael, or Domicio should be returned.Any customer whose last name is Michaelangelo, or Omici, Dibromic should be returned. Every property of the customer object should be checked for a match.
+
 namespace BangazonAPI.Controllers
 {
     [Route("api/[controller]")]
@@ -32,16 +42,32 @@ namespace BangazonAPI.Controllers
 
         // GET api/values
         [HttpGet]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> Get(string q)
         {
 
             string sql = @"SELECT c.Id AS CustomerId, c.FirstName, c.LastName FROM Customer c";
+
+            if (q != null)
+            {
+                sql = $@"{sql} WHERE (
+                    c.LastName LIKE @q
+                    OR c.FirstName LIKE @q
+                    )
+                    ";
+
+            }
             using (SqlConnection conn = Connection)
             {
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = sql;
+
+                    if (q != null)
+                    {
+                        cmd.Parameters.Add(new SqlParameter("@q", $"%{q}%"));
+
+                    }
 
                     SqlDataReader reader = await cmd.ExecuteReaderAsync();
 
