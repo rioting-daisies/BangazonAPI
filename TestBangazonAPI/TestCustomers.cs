@@ -110,5 +110,45 @@ namespace TestBangazonAPI
                 Assert.Equal(HttpStatusCode.NotFound, deleteResponse.StatusCode);
             }
         }
+
+        [Fact]
+        public async Task Test_Modify_Customer()
+        {
+            // New last name to change to and test
+            string newFirstName = "Seymour";
+
+            using (var client = new APIClientProvider().Client)
+            {
+                /*
+                    PUT section
+                 */
+                Customer modifiedSeymour = new Customer
+                {
+                    FirstName = newFirstName,
+                    LastName = "Butts"
+                };
+                var modifiedSeymourAsJSON = JsonConvert.SerializeObject(modifiedSeymour);
+
+                var response = await client.PutAsync(
+                    "api/Customer/1",
+                    new StringContent(modifiedSeymourAsJSON, Encoding.UTF8, "application/json")
+                );
+                string responseBody = await response.Content.ReadAsStringAsync();
+
+                Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+
+                /*
+                    GET section
+                 */
+                var getSeymour = await client.GetAsync("api/Customer/1");
+                getSeymour.EnsureSuccessStatusCode();
+
+                string getSeymourBody = await getSeymour.Content.ReadAsStringAsync();
+                Customer newSeymour = JsonConvert.DeserializeObject<Customer>(getSeymourBody);
+
+                Assert.Equal(HttpStatusCode.OK, getSeymour.StatusCode);
+                Assert.Equal(newFirstName, newSeymour.FirstName);
+            }
+        }
     }
 }
