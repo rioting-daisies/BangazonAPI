@@ -61,10 +61,39 @@ namespace BangazonAPI.Controllers
         }
 
         // GET: api/PaymentType/5
-        [HttpGet("{id}", Name = "Get")]
-        public string Get(int id)
+        [HttpGet("{id}")]
+        //[HttpGet("{id}", Name = "Get")]
+        public async Task<IActionResult> Get(int id)
         {
-            return "value";
+            if (!PaymentTypeExists(id))
+            {
+                return new StatusCodeResult(StatusCodes.Status404NotFound);
+            }
+            string sql = "SELECT Id, AcctNumber, Name, CustomerId FROM PaymentType WHERE Id = @id";
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = sql;
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
+                    SqlDataReader reader = await cmd.ExecuteReaderAsync();
+                    PaymentType paymentType = null; 
+
+                    if(reader.Read())
+                    {
+                        paymentType = new PaymentType()
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            AcctNumber = reader.GetInt32(reader.GetOrdinal("AcctNumber")),
+                            Name = reader.GetString(reader.GetOrdinal("Name")),
+                            CustomerId = reader.GetInt32(reader.GetOrdinal("CustomerId"))
+                        };
+                    }
+                    reader.Close();
+                    return Ok(paymentType);
+                }
+            }
         }
 
         // POST: api/PaymentType
@@ -83,6 +112,22 @@ namespace BangazonAPI.Controllers
         [HttpDelete("{id}")]
         public void Delete(int id)
         {
+        }
+
+        private bool PaymentTypeExists(int id)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"SELECT Id, AcctNumber, Name, CustomerId From PaymentType where Id = @id";
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
+
+                    SqlDataReader reader = cmd.ExecuteReader();
+                    return reader.Read();
+                }
+            }
         }
     }
 }
