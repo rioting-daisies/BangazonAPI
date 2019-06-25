@@ -11,10 +11,13 @@ SELECT * FROM Product;
 SELECT * FROM ProductType;
 SELECT * FROM TrainingProgram;
 
+
+
 -- INSERT INTO ProductType ([Name]) VALUES ('Computers');
 -- INSERT INTO ProductType ([Name]) VALUES ('Printers');
 -- INSERT INTO ProductType ([Name]) VALUES ('Appliances');
 -- INSERT INTO ProductType ([Name]) VALUES ('TVs');
+
 
 -- INSERT into Customer (FirstName, LastName) VALUES ('Sermour', 'Butts');
 
@@ -39,3 +42,4 @@ INSERT INTO ComputerEmployee (EmployeeId, ComputerId, AssignDate, UnassignDate) 
 INSERT INTO EmployeeTraining (EmployeeId, TrainingProgramId) VALUES (1, 1);
 
 INSERT INTO OrderProduct (OrderId, ProductId) VALUES (1, 1);
+
