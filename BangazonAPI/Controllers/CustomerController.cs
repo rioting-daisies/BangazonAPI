@@ -1,4 +1,9 @@
-﻿using System;
+﻿// Author: Chris Morgan
+
+// The purpose of the customer controller is to define normal database interactions (Get, Put, Post, Delete) plus any other requirements made by the client. 
+
+
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
@@ -21,10 +26,13 @@ using Microsoft.Extensions.Configuration;
 
 namespace BangazonAPI.Controllers
 {
+    // The route is setup to be the controller name which is Customer, the route for these functions is api/Customer
+
     [Route("api/[controller]")]
     [ApiController]
     public class CustomerController : ControllerBase
     {
+        // We establish the Connection property by referencing the DefaultConnection value in the appsettings.json file. This allows us to connect to BangazonAPI database
         private readonly IConfiguration _config;
 
         public CustomerController(IConfiguration config)
@@ -40,7 +48,8 @@ namespace BangazonAPI.Controllers
             }
         }
 
-        // GET api/values
+        // GET api/Customer
+        // This method returns a list of all Customers in the database if no query paramter is input.
         [HttpGet]
         public async Task<IActionResult> Get(string q)
         {
@@ -87,7 +96,7 @@ namespace BangazonAPI.Controllers
 
                     reader.Close();
 
-                    // If no customers are found (especially matching the 'q' query string paramater, the get will return a 404
+                    // If no customers are found (especially matching the 'q' query string paramater), the get will return a 404
 
                     if(customers.Count == 0)
                     {
@@ -99,7 +108,8 @@ namespace BangazonAPI.Controllers
             }
         }
 
-        // GET api/values/5
+        // GET api/Customer/5
+        // This is the Get Customer by Id method that returns a single customer whose id = parameter Id obtained by the route. If no customer is found, a 404 status code is returned. 
         [HttpGet("{id}")]
         public async Task<IActionResult> Get([FromRoute]int id)
         {
@@ -138,7 +148,8 @@ namespace BangazonAPI.Controllers
             }
         }
 
-        // POST api/values
+        // POST api/Customer
+        // The Post method inserts a new Customer item into the database and then returns the new customer instance
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] Customer customer)
         {
@@ -163,7 +174,8 @@ namespace BangazonAPI.Controllers
             }
         }
 
-        // PUT api/values/5
+        // PUT api/Customer/5
+        // The put method is used to modify a customer item in the database. It accepts 2 parameters, an Id of the customer to modify, and then a Customer object with the updated values that will be passed in to modify if the customer in the database is found.
         [HttpPut("{id}")]
         public async Task<IActionResult> Put([FromRoute]int id, [FromBody] Customer customer)
         {
@@ -208,7 +220,8 @@ namespace BangazonAPI.Controllers
             }
         }
 
-        // DELETE api/values/5
+        // DELETE api/Customer/5
+        // The Delete method is used to delete a customer from the database. It accepts one parameter which is used to find the customer in the database to delete. If the delete is successful, it will return a 204 code. If a customer with this Id is not found, it will return a 404 status code.
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
@@ -245,6 +258,8 @@ namespace BangazonAPI.Controllers
                 }
             
         }
+
+        // The CustomerExists method returns a boolean value that represents whether or not a customer with the Id passed in from the parameter exists. This method is used throughout this file to minimize code.
 
         private bool CustomerExists(int id)
         {
