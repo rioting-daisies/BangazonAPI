@@ -31,7 +31,7 @@ namespace BangazonAPI.Controllers
 
         // GET: api/PaymentType
         [HttpGet]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> GetPaymentTypes()
         {
             string sql = "SELECT Id, AcctNumber, Name, CustomerId FROM PaymentType";
             using (SqlConnection conn = Connection)
@@ -61,9 +61,9 @@ namespace BangazonAPI.Controllers
         }
 
         // GET: api/PaymentType/5
-        [HttpGet("{id}")]
-        //[HttpGet("{id}", Name = "Get")]
-        public async Task<IActionResult> Get(int id)
+        //[HttpGet("{id}")]
+        [HttpGet("{id}", Name = "GetPayment")]
+        public async Task<IActionResult> Get([FromRoute]int id)
         {
             if (!PaymentTypeExists(id))
             {
@@ -98,20 +98,103 @@ namespace BangazonAPI.Controllers
 
         // POST: api/PaymentType
         [HttpPost]
-        public void Post([FromBody] string value)
+        public async Task<IActionResult> Post([FromBody] PaymentType paymentType)
         {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = "INSERT INTO PaymentType (AcctNumber, Name, CustomerId) OUTPUT INSERTED.Id VALUES (@AcctNumber, @Name, @CustomerId)";
+
+                    cmd.Parameters.Add(new SqlParameter("@AcctNumber", paymentType.AcctNumber));
+                    cmd.Parameters.Add(new SqlParameter("@Name", paymentType.Name));
+                    cmd.Parameters.Add(new SqlParameter("@CustomerId", paymentType.CustomerId));
+
+                    int newId = (int)await cmd.ExecuteScalarAsync();
+                    paymentType.Id = newId;
+                    return CreatedAtRoute("GetPayment", new { id = newId }, paymentType);
+                }
+            }
         }
+
 
         // PUT: api/PaymentType/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public async Task<IActionResult> Put([FromRoute] int id, [FromBody] PaymentType paymentType)
         {
+            try
+            {
+                using (SqlConnection conn = Connection)
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = "UPDATE PaymentType SET AcctNumber = @AcctNumber, Name = @Name, CustomerId = @CustomerId WHERE Id = @Id";
+
+                        cmd.Parameters.Add(new SqlParameter("@AcctNumber", paymentType.AcctNumber));
+                        cmd.Parameters.Add(new SqlParameter("@Name", paymentType.Name));
+                        cmd.Parameters.Add(new SqlParameter("@CustomerId", paymentType.CustomerId));
+                        cmd.Parameters.Add(new SqlParameter("@Id", id));
+
+                        int rowAffected = await cmd.ExecuteNonQueryAsync();
+
+                        if(rowAffected > 0)
+                        {
+                            return new StatusCodeResult(StatusCodes.Status204NoContent);
+                        }
+                        throw new Exception("Did't work yo");
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                if (!PaymentTypeExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
         }
 
         // DELETE: api/ApiWithActions/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public async Task<IActionResult> Delete([FromRoute] int id)
         {
+            try
+            {
+                using (SqlConnection conn = Connection)
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = "DELETE FROM PaymentType WHERE Id = @Id";
+                        cmd.Parameters.Add(new SqlParameter("@Id", id));
+
+                        int rowAffected = await cmd.ExecuteNonQueryAsync();
+
+                        if(rowAffected > 0)
+                        {
+                            return new StatusCodeResult(StatusCodes.Status204NoContent);
+                        }
+                        throw new Exception("didn't work dog");
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                if (!PaymentTypeExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
         }
 
         private bool PaymentTypeExists(int id)
