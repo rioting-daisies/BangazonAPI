@@ -16,3 +16,5 @@ INSERT into Customer (FirstName, LastName) VALUES ('Sermour', 'Butts');
 
 INSERT into PaymentType (AcctNumber, [Name], CustomerId) VALUES (123456, 'Visa', 1);
 INSERT into PaymentType (AcctNumber, [Name], CustomerId) VALUES (678902, 'MasterCard', 1);
+
+UPDATE Customer SET FirstName = 'Sermour' WHERE FirstName = 'Seymour';
