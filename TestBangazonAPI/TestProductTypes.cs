@@ -55,7 +55,7 @@ namespace TestBangazonAPI
                 Assert.NotNull(productType);
             }
         }
-        // Test to make sure .
+        // Test to check attempt to get a non existent product type.
         [Fact]
         public async Task Test_Get_NonExitant_ProductType_Fails()
         {
@@ -65,7 +65,8 @@ namespace TestBangazonAPI
                 var response = await client.GetAsync("api/producttype/999999999");
                 Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
             }
-        }        
+        }
+        // Test to check the post and delete product type controllers. 
         [Fact]
         public async Task Test_Create_Delete_ProductType()
         {
@@ -93,6 +94,7 @@ namespace TestBangazonAPI
                 Assert.Equal(HttpStatusCode.NoContent, deleteResponse.StatusCode);
             }
         }
+        // Test to check for attempt to delete a non existent product type. 
         [Fact]
         public async Task Test_Delete_NonExistent_ProductType_Fails()
         {
@@ -104,6 +106,7 @@ namespace TestBangazonAPI
                 Assert.Equal(HttpStatusCode.NotFound, deleteResponse.StatusCode);
             }
         }
+        // Test to check the modify product type controller. 
         [Fact]
         public async Task Test_Modify_ProductType()
         {
@@ -142,7 +145,7 @@ namespace TestBangazonAPI
                 Assert.Equal(newName, newComputer.Name);
             }
         }
-        // Test to check for attempt to modify a non existent object. 
+        // Test to check for attempt to modify a non existent product type. 
         [Fact]
         public async Task Test_Modify_NonExistent_ProductType_Fails()
         {
