@@ -128,6 +128,11 @@ namespace BangazonAPI.Controllers
 
                     reader.Close();
 
+                    if(customer == null)
+                    {
+                        return new StatusCodeResult(StatusCodes.Status404NotFound);
+                    }
+
                     return Ok(customer);
                 }
             }

@@ -25,7 +25,7 @@ namespace TestBangazonAPI
                 /*
                     ACT
                 */
-                var response = await client.GetAsync("/api/Customer");
+                var response = await client.GetAsync("api/Customer");
 
 
                 string responseBody = await response.Content.ReadAsStringAsync();
@@ -62,7 +62,7 @@ namespace TestBangazonAPI
 
             using (var client = new APIClientProvider().Client)
             {
-                var response = await client.GetAsync("/Customer/999999999");
+                var response = await client.GetAsync("api/Customer/999999999");
                 Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
             }
         }
@@ -104,7 +104,7 @@ namespace TestBangazonAPI
         {
             using (var client = new APIClientProvider().Client)
             {
-                var deleteResponse = await client.DeleteAsync("/api/Customer/600000");
+                var deleteResponse = await client.DeleteAsync("api/Customer/600000");
 
                 Assert.False(deleteResponse.IsSuccessStatusCode);
                 Assert.Equal(HttpStatusCode.NotFound, deleteResponse.StatusCode);
@@ -165,6 +165,17 @@ namespace TestBangazonAPI
                 Assert.Equal("Seymour", customers[0].FirstName);
                 Assert.Equal("Butts", customers[0].LastName);
                 Assert.NotNull(customers[0]);
+            }
+        }
+
+        [Fact]
+        public async Task Test_Get_NonExistentCustomer_With_Q_Query_String_Parameter()
+        {
+            using (var client = new APIClientProvider().Client)
+            {
+                var response = await client.GetAsync("api/Customer?q=z");
+
+                Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
             }
         }
     }
