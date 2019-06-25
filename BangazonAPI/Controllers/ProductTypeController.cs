@@ -1,4 +1,5 @@
-﻿using System;
+﻿//Author: Billy Mitchell
+using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
@@ -9,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 
 namespace BangazonAPI.Controllers
-{
+{   // Setting the default route, api/producttype, 
     [Route("api/[controller]")]
     [ApiController]
     public class ProductTypeController : ControllerBase
@@ -20,7 +21,7 @@ namespace BangazonAPI.Controllers
         {
             _config = config;
         }
-
+        // Getting and setting the connection property through the DefaultConnection in appsettings.json which connects this file to the database
         public SqlConnection Connection
         {
             get
@@ -59,8 +60,7 @@ namespace BangazonAPI.Controllers
         }
 
         // GET One Product Type Entry
-        [HttpGet("{id}", Name = "GetProductType")]
-        //[HttpGet("{id}", Name = "Get")]
+        [HttpGet("{id}", Name = "GetProductType")]        
         public async Task<IActionResult> Get(int id)
         {
             if (!ProductTypeExists(id))
@@ -87,12 +87,13 @@ namespace BangazonAPI.Controllers
                         };
                     }
                     reader.Close();
+
                     return Ok(productType);
                 }
             }
         }
 
-        // POST Product Type Entry
+        // POST One Product Type Entry
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] ProductType productType)
         {
@@ -113,7 +114,7 @@ namespace BangazonAPI.Controllers
             }
         }
 
-        // PUT (update) Product Type Entry
+        // PUT (update) One Product Type Entry
         [HttpPut("{id}")]
         public async Task<IActionResult> Put([FromRoute] int id, [FromBody] ProductType productType)
         {
@@ -151,7 +152,7 @@ namespace BangazonAPI.Controllers
                 }
             }
         }
-        // DELETE Product Type Entry
+        // DELETE One Product Type Entry
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete([FromRoute] int id)
         {
@@ -186,6 +187,7 @@ namespace BangazonAPI.Controllers
                 }
             }
         }
+        //This method is used within the get by id, put, and delete methods to make sure the object exists.
         private bool ProductTypeExists(int id)
         {
             using (SqlConnection conn = Connection)

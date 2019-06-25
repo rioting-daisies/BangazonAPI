@@ -62,31 +62,7 @@ namespace TestBangazonAPI
                 var response = await client.GetAsync("api/producttype/999999999");
                 Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
             }
-        }
-        [Fact]
-        public async Task Test_Create_ProductType()
-        {
-            using (var client = new APIClientProvider().Client)
-            {
-                ProductType tablet = new ProductType
-                {
-                    Name = "Tablets"                    
-                };
-                var tabletAsJSON = JsonConvert.SerializeObject(tablet);
-
-
-                var response = await client.PostAsync(
-                    "api/producttype/",
-                    new StringContent(tabletAsJSON, Encoding.UTF8, "application/json")
-                );
-
-                string responseBody = await response.Content.ReadAsStringAsync();
-                var newTablet = JsonConvert.DeserializeObject<ProductType>(responseBody);
-
-                Assert.Equal(HttpStatusCode.Created, response.StatusCode);
-                Assert.Equal("Tablets", newTablet.Name);
-            }
-        }
+        }        
         [Fact]
         public async Task Test_Create_Delete_ProductType()
         {
@@ -129,7 +105,7 @@ namespace TestBangazonAPI
         public async Task Test_Modify_ProductType()
         {
             // New name to change to and test
-            string newName = "Appliances";
+            string newName = "Computers";
 
             using (var client = new APIClientProvider().Client)
             {
@@ -143,7 +119,7 @@ namespace TestBangazonAPI
                 var modifiedApplianceAsJSON = JsonConvert.SerializeObject(modifiedAppliance);
 
                 var response = await client.PutAsync(
-                    "api/producttype/6",
+                    "api/producttype/1",
                     new StringContent(modifiedApplianceAsJSON, Encoding.UTF8, "application/json")
                 );
                 string responseBody = await response.Content.ReadAsStringAsync();
@@ -153,7 +129,7 @@ namespace TestBangazonAPI
                 /*
                     GET section
                  */
-                var getAppliance = await client.GetAsync("api/producttype/6");
+                var getAppliance = await client.GetAsync("api/producttype/1");
                 getAppliance.EnsureSuccessStatusCode();
 
                 string getApplianceBody = await getAppliance.Content.ReadAsStringAsync();

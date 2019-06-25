@@ -12,7 +12,15 @@ SELECT * FROM ProductType;
 SELECT * FROM TrainingProgram;
 
 
-INSERT into Customer (FirstName, LastName) VALUES ('Sermour', 'Butts');
+-- INSERT into Customer (FirstName, LastName) VALUES ('Sermour', 'Butts');
 
-INSERT into PaymentType (AcctNumber, [Name], CustomerId) VALUES (123456, 'Visa', 1);
-INSERT into PaymentType (AcctNumber, [Name], CustomerId) VALUES (678902, 'MasterCard', 1);
+-- INSERT into PaymentType (AcctNumber, [Name], CustomerId) VALUES (123456, 'Visa', 1);
+-- INSERT into PaymentType (AcctNumber, [Name], CustomerId) VALUES (678902, 'MasterCard', 1);
+
+-- INSERT INTO ProductType ([Name]) VALUES ('Computers');
+-- INSERT INTO ProductType ([Name]) VALUES ('Printers');
+-- INSERT INTO ProductType ([Name]) VALUES ('Appliances');
+-- INSERT INTO ProductType ([Name]) VALUES ('TVs');
+
+
+
