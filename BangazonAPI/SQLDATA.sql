@@ -24,18 +24,19 @@ SELECT * FROM TrainingProgram;
 -- INSERT into Product (ProductTypeId, CustomerId, Price, Title, [Description], Quantity) VALUES (1, 1, 222, 'Vaccuum of Destiny', 'Sucks you into your destiny. Youll prolly die oops.', 2);
 -- INSERT into Product (ProductTypeId, CustomerId, Price, Title, [Description], Quantity) VALUES (1, 1, 420666.0000, 'Infinity Gauntlet', 'Just snap your fingers... itll be fine.', 1);
 
-INSERT INTO Computer (PurchaseDate, DecomissionDate, Make, Manufacturer) VALUES ('20190618 10:34:09 AM', '20190618 10:34:09 AM', 'Latitude', 'Dell');
+-- INSERT INTO Computer (PurchaseDate, DecomissionDate, Make, Manufacturer) VALUES ('20190618 10:34:09 AM', '20190618 10:34:09 AM', 'Latitude', 'Dell');
 
-INSERT INTO Department ([Name], Budget) VALUES ('HR', 25000);
+-- INSERT INTO Department ([Name], Budget) VALUES ('HR', 25000);
 
-INSERT INTO Employee (FirstName, LastName, DepartmentId, IsSuperVisor) VALUES ('Firey', 'Dragon', 1, 1);
+-- INSERT INTO Employee (FirstName, LastName, DepartmentId, IsSuperVisor) VALUES ('Firey', 'Dragon', 1, 1);
 
-INSERT INTO [Order] (CustomerId, PaymentTypeId) VALUES (1, 1);
+-- INSERT INTO [Order] (CustomerId, PaymentTypeId) VALUES (1, 1);
 
-INSERT INTO TrainingProgram ([Name], StartDate, EndDate, MaxAttendees) VALUES ('Dragon Training','20190618 10:34:09 AM', '20190618 10:34:09 AM', 2);
+-- INSERT INTO TrainingProgram ([Name], StartDate, EndDate, MaxAttendees) VALUES ('Dragon Training','20190618 10:34:09 AM', '20190618 10:34:09 AM', 2);
 
-INSERT INTO ComputerEmployee (EmployeeId, ComputerId, AssignDate, UnassignDate) VALUES (1, 1,'20190618 10:34:09 AM', '20190618 10:34:09 AM');
+-- INSERT INTO ComputerEmployee (EmployeeId, ComputerId, AssignDate, UnassignDate) VALUES (1, 1,'20190618 10:34:09 AM', '20190618 10:34:09 AM');
 
-INSERT INTO EmployeeTraining (EmployeeId, TrainingProgramId) VALUES (1, 1);
+-- INSERT INTO EmployeeTraining (EmployeeId, TrainingProgramId) VALUES (1, 1);
 
-INSERT INTO OrderProduct (OrderId, ProductId) VALUES (1, 1);
+-- INSERT INTO OrderProduct (OrderId, ProductId) VALUES (1, 1);
+
