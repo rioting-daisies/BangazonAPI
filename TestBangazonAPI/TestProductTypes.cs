@@ -1,4 +1,5 @@
-﻿using System;
+﻿// Author: Billy Mitchell
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Net;
@@ -11,7 +12,7 @@ using System.Net.Http;
 namespace TestBangazonAPI
 {
     public class TestProductTypes
-    {
+    {   // Test to check functionality of the get all ProductType controller.
         [Fact]
         public async Task Test_Get_All_ProductTypes()
         {
@@ -38,6 +39,7 @@ namespace TestBangazonAPI
                 Assert.True(productTypes.Count > 0);
             }
         }
+        // Test to check functionality of the get one ProductType by Id controller.
         [Fact]
         public async Task Test_Get_Single_ProductType()
         {
@@ -53,6 +55,7 @@ namespace TestBangazonAPI
                 Assert.NotNull(productType);
             }
         }
+        // Test to make sure .
         [Fact]
         public async Task Test_Get_NonExitant_ProductType_Fails()
         {
@@ -112,15 +115,15 @@ namespace TestBangazonAPI
                 /*
                     PUT section
                  */
-                ProductType modifiedAppliance = new ProductType
+                ProductType modifiedComputer = new ProductType
                 {
                     Name = newName
                 };
-                var modifiedApplianceAsJSON = JsonConvert.SerializeObject(modifiedAppliance);
+                var modifiedComputerAsJSON = JsonConvert.SerializeObject(modifiedComputer);
 
                 var response = await client.PutAsync(
                     "api/producttype/1",
-                    new StringContent(modifiedApplianceAsJSON, Encoding.UTF8, "application/json")
+                    new StringContent(modifiedComputerAsJSON, Encoding.UTF8, "application/json")
                 );
                 string responseBody = await response.Content.ReadAsStringAsync();
 
@@ -129,14 +132,33 @@ namespace TestBangazonAPI
                 /*
                     GET section
                  */
-                var getAppliance = await client.GetAsync("api/producttype/1");
-                getAppliance.EnsureSuccessStatusCode();
+                var getComputer = await client.GetAsync("api/producttype/1");
+                getComputer.EnsureSuccessStatusCode();
 
-                string getApplianceBody = await getAppliance.Content.ReadAsStringAsync();
-                ProductType newAppliance = JsonConvert.DeserializeObject<ProductType>(getApplianceBody);
+                string getComputerBody = await getComputer.Content.ReadAsStringAsync();
+                ProductType newComputer = JsonConvert.DeserializeObject<ProductType>(getComputerBody);
 
-                Assert.Equal(HttpStatusCode.OK, getAppliance.StatusCode);
-                Assert.Equal(newName, newAppliance.Name);
+                Assert.Equal(HttpStatusCode.OK, getComputer.StatusCode);
+                Assert.Equal(newName, newComputer.Name);
+            }
+        }
+        // Test to check for attempt to modify a non existent object. 
+        [Fact]
+        public async Task Test_Modify_NonExistent_ProductType_Fails()
+        {
+            string newName = "Computers";
+            using (var client = new APIClientProvider().Client)
+            {
+                ProductType modifiedComputer = new ProductType
+                {
+                    Name = newName
+                };
+                var modifiedComputerAsJSON = JsonConvert.SerializeObject(modifiedComputer);
+                var modifyResponse = await client.PutAsync("/api/producttype/600000",
+                    new StringContent(modifiedComputerAsJSON, Encoding.UTF8, "application/json"));
+
+                Assert.False(modifyResponse.IsSuccessStatusCode);
+                Assert.Equal(HttpStatusCode.NotFound, modifyResponse.StatusCode);
             }
         }
     }
