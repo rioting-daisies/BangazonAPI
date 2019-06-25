@@ -17,3 +17,5 @@ namespace BangazonAPI.Models
         public int CustomerId { get; set; }
     }
 }
+
+//author Alex. class has same properties as SQL data.  CustomerId references Customer table to show what paymentType is with different customers as a 1 to many relationship
