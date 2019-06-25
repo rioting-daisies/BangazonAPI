@@ -11,6 +11,7 @@
 -- SELECT * FROM ProductType;
 -- SELECT * FROM TrainingProgram;
 
+-- INSERT into ProductType (Name) VALUES ('Appliances');
 
 -- INSERT into Customer (FirstName, LastName) VALUES ('Sermour', 'Butts');
 
