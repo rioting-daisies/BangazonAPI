@@ -12,6 +12,8 @@ namespace TestBangazonAPI
 {
     public class TestPaymentTypes
     {
+        //test for get all data. 
+
         [Fact]
         public async Task Test_Get_All_PaymentTypes()
         {
@@ -38,6 +40,9 @@ namespace TestBangazonAPI
                 Assert.True(paymentTypes.Count > 0);
             }
         }
+
+        //test to see if paymenttype with id 1 is equal to the values of 123456, visa, and 1. if not, test will fail
+
         [Fact]
         public async Task Test_Get_Single_PaymentType()
         {
@@ -56,6 +61,8 @@ namespace TestBangazonAPI
             }
         }
 
+        //tests to see if paymenttype with id 9999 exists. this id does not exist, so if it does, test will fail 
+
         [Fact]
         public async Task Test_Get_NonExitant_PaymentType_Fails()
         {
@@ -66,6 +73,7 @@ namespace TestBangazonAPI
             }
         }
 
+        //test will create an object, insert it into the paymenttype table, then delete it. test will fail if post or delete doesnt work
 
         [Fact]
         public async Task Test_Create_and_Delete_PaymentType()
@@ -95,6 +103,8 @@ namespace TestBangazonAPI
             }
         }
 
+        //test tries to delete an item that doesn't exist. test should fail because it can't delete an item that doesn't exist
+
         [Fact]
         public async Task Test_Delete_NonExistent_PaymentType_Fail()
         {
@@ -107,6 +117,7 @@ namespace TestBangazonAPI
             }
         }
 
+        //test will update the first object with the same data. if status codes return are valid then test will work
 
         [Fact]
         public async Task Test_Modify_PaymentType()
@@ -138,6 +149,9 @@ namespace TestBangazonAPI
 
             }
         }
+
+        //test tries to update an item that doesn't exist. test works if the update fails. 
+
         [Fact]
         public async Task Test_Edit_NonExistent_PaymentType_Fails ()
         {

@@ -29,6 +29,8 @@ namespace BangazonAPI.Controllers
             }
         }
 
+        //Gets all data from PaymentType table from SQL. 
+
         // GET: api/PaymentType
         [HttpGet]
         public async Task<IActionResult> GetPaymentTypes()
@@ -59,6 +61,8 @@ namespace BangazonAPI.Controllers
                 }
             }
         }
+
+        //gets one paymentType based on Id.  Method gets the Id from route.  uses PaymentTypeExists(id) which returns true or false. it will test the id that is passed in and return true if it exists and false if it doesn't
 
         // GET: api/PaymentType/5
         //[HttpGet("{id}")]
@@ -96,6 +100,8 @@ namespace BangazonAPI.Controllers
             }
         }
 
+        //Post a new object into paymenttype table.  it takes a object that type paymenttype to be inserted into the table
+
         // POST: api/PaymentType
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] PaymentType paymentType)
@@ -118,6 +124,7 @@ namespace BangazonAPI.Controllers
             }
         }
 
+        //updates a certain object. takes two arguments, the id tells us which object to update and paymenttype is the object that will be updated to. 
 
         // PUT: api/PaymentType/5
         [HttpPut("{id}")]
@@ -160,6 +167,8 @@ namespace BangazonAPI.Controllers
             }
         }
 
+        //deletes a paymenttype. takes id as argument to know which item to delete. 
+
         // DELETE: api/ApiWithActions/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete([FromRoute] int id)
@@ -196,6 +205,8 @@ namespace BangazonAPI.Controllers
                 }
             }
         }
+
+        //returns a bool based on if a paymenttype exists or not based on id
 
         private bool PaymentTypeExists(int id)
         {
