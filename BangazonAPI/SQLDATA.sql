@@ -22,5 +22,18 @@ SELECT * FROM TrainingProgram;
 -- INSERT INTO ProductType ([Name]) VALUES ('Appliances');
 -- INSERT INTO ProductType ([Name]) VALUES ('TVs');
 
+INSERT INTO Computer (PurchaseDate, DecomissionDate, Make, Manufacturer) VALUES ('20190618 10:34:09 AM', '20190618 10:34:09 AM', 'Latitude', 'Dell');
 
+INSERT INTO Department ([Name], Budget) VALUES ('HR', 25000);
 
+INSERT INTO Employee (FirstName, LastName, DepartmentId, IsSuperVisor) VALUES ('Firey', 'Dragon', 1, 1);
+
+INSERT INTO [Order] (CustomerId, PaymentTypeId) VALUES (1, 1);
+
+INSERT INTO TrainingProgram ([Name], StartDate, EndDate, MaxAttendees) VALUES ('Dragon Training','20190618 10:34:09 AM', '20190618 10:34:09 AM', 2);
+
+INSERT INTO ComputerEmployee (EmployeeId, ComputerId, AssignDate, UnassignDate) VALUES (1, 1,'20190618 10:34:09 AM', '20190618 10:34:09 AM');
+
+INSERT INTO EmployeeTraining (EmployeeId, TrainingProgramId) VALUES (1, 1);
+
+INSERT INTO OrderProduct (OrderId, ProductId) VALUES (1, 1);
