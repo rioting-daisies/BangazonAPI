@@ -87,6 +87,13 @@ namespace BangazonAPI.Controllers
 
                     reader.Close();
 
+                    // If no customers are found (especially matching the 'q' query string paramater, the get will return a 404
+
+                    if(customers.Count == 0)
+                    {
+                        return new StatusCodeResult(StatusCodes.Status404NotFound);
+                    }
+
                     return Ok(customers);
                 }
             }

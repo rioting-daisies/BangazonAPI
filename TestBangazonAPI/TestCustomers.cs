@@ -50,7 +50,7 @@ namespace TestBangazonAPI
                 var customer = JsonConvert.DeserializeObject<Customer>(responseBody);
 
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-                Assert.Equal("Sermour", customer.FirstName);
+                Assert.Equal("Seymour", customer.FirstName);
                 Assert.Equal("Butts", customer.LastName);
                 Assert.NotNull(customer);
             }
@@ -148,6 +148,23 @@ namespace TestBangazonAPI
 
                 Assert.Equal(HttpStatusCode.OK, getSeymour.StatusCode);
                 Assert.Equal(newFirstName, newSeymour.FirstName);
+            }
+        }
+
+        [Fact]
+        public async Task Test_Get_Customer_With_Q_Query_String_Parameter_Success()
+        {
+            using (var client = new APIClientProvider().Client)
+            {
+                var response = await client.GetAsync("api/Customer?q=sey");
+
+                string responseBody = await response.Content.ReadAsStringAsync();
+                var customers = JsonConvert.DeserializeObject<List<Customer>>(responseBody);
+
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                Assert.Equal("Seymour", customers[0].FirstName);
+                Assert.Equal("Butts", customers[0].LastName);
+                Assert.NotNull(customers[0]);
             }
         }
     }
