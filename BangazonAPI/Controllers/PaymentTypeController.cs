@@ -225,3 +225,5 @@ namespace BangazonAPI.Controllers
         }
     }
 }
+
+//created by Alex, purpose - allow user to GET all data, post data, update data and delete data

@@ -174,3 +174,5 @@ namespace TestBangazonAPI
 
     }
 }
+
+//created by Alex, purpose - test each controller method - GET, POST, PUT, DELETE
