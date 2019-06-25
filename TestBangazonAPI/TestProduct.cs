@@ -44,7 +44,7 @@ namespace TestBangazonAPI
                 Assert.Equal(1, product.CustomerId);
                 Assert.Equal(222, product.Price);
                 Assert.Equal("Vaccuum of Destiny", product.Title);
-                Assert.Equal("Sucks you into your destiny. You'll prolly die oops.", product.Description);
+                Assert.Equal("Sucks you into your destiny. Youll prolly die oops.", product.Description);
                 Assert.Equal(2, product.Quantity);
                 Assert.NotNull(product);
             }
@@ -125,7 +125,7 @@ namespace TestBangazonAPI
                     CustomerId = 1,
                     Price = newPrice,
                     Title = "Vaccuum of Destiny",
-                    Description = "Sucks you into your destiny. You'll prolly die oops.",
+                    Description = "Sucks you into your destiny. Youll prolly die oops.",
                     Quantity = 2
                 };
                 var modifiedVaccuumAsJSON = JsonConvert.SerializeObject(modifiedVaccuum);
