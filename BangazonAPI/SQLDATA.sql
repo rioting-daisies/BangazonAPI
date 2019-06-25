@@ -43,8 +43,8 @@ SELECT * FROM TrainingProgram;
 
 -- INSERT INTO OrderProduct (OrderId, ProductId) VALUES (1, 1);
 
-<<<<<<< HEAD
-=======
+
+
 INSERT INTO OrderProduct (OrderId, ProductId) VALUES (1, 1);
 
->>>>>>> 1caedad9995be6032badc75121fefa167c623100
+
