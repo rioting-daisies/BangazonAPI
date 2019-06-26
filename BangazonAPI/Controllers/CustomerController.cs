@@ -59,9 +59,10 @@ namespace BangazonAPI.Controllers
             {
                 sql = @"SELECT c.Id AS CustomerId, c.FirstName, c.LastName FROM Customer c";
             }
-            else
+            else if(_include == "products")
             {
-                sql = "SELECT c.Id AS CustomerId, c.FirstName, c.LastName, p.Id AS ProductId, p.Price, p.Title, p.Description, p.Quantity FROM Customer c JOIN Product p ON p.CustomerId = c.Id";
+               
+                sql = "SELECT c.Id AS CustomerId, c.FirstName, c.LastName, p.Id AS ProductId, p.Price, p.Title, p.Description, p.Quantity, p.ProductTypeId FROM Customer c JOIN Product p ON p.CustomerId = c.Id";
             }
 
             if (q != null)
@@ -89,17 +90,49 @@ namespace BangazonAPI.Controllers
                     SqlDataReader reader = await cmd.ExecuteReaderAsync();
 
                     List<Customer> customers = new List<Customer>();
+
+                    
+                    List<Product> products = new List<Product>();
+                    
+
                     while (reader.Read())
                     {
+                        
                         Customer customer = new Customer
                         {
                             Id = reader.GetInt32(reader.GetOrdinal("CustomerId")),
                             FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
-                            LastName = reader.GetString(reader.GetOrdinal("LastName")),
-                            // You might have more columns
+                            LastName = reader.GetString(reader.GetOrdinal("LastName"))
+                            
                         };
 
-                        customers.Add(customer);
+                        Product product = null;
+
+                        if (_include == "products")
+                        {
+                            product = new Product
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("ProductId")),
+                                ProductTypeId = reader.GetInt32(reader.GetOrdinal("ProductTypeId")),
+                                CustomerId = reader.GetInt32(reader.GetOrdinal("CustomerId")),
+                                Price = reader.GetDecimal(reader.GetOrdinal("Price")),
+                                Title = reader.GetString(reader.GetOrdinal("Title")),
+                                Description = reader.GetString(reader.GetOrdinal("Description")),
+                                Quantity = reader.GetInt32(reader.GetOrdinal("Quantity"))
+                            };
+                            products.Add(product);
+                        }
+
+                        if(!customers.Any(c => c.Id == customer.Id))
+                        {
+                            customers.Add(customer);
+                        }
+                        else
+                        {
+                            customers.Find(c => c.Id == customer.Id).ListOfProducts = products.Where(p => p.CustomerId == customer.Id).ToList();
+                                
+                        }
+                        
                     }
 
                     reader.Close();
