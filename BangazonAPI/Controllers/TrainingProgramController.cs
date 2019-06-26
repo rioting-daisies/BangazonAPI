@@ -93,9 +93,51 @@ namespace BangazonAPI.Controllers
 
         // GET: api/TrainingProgram/5
         [HttpGet("{id}", Name = "Get")]
-        public string Get(int id)
+        public async Task<IActionResult> Get([FromRoute]int id)
         {
-            return "value";
+            if (!TrainingProgramExists(id))
+            {
+                return new StatusCodeResult(StatusCodes.Status404NotFound);
+            }
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"SELECT tp.Id, tp.Name, tp.StartDate, tp.EndDate, tp.MaxAttendees, e.Id, e.FirstName, e.LastName, e.DepartmentId, e.IsSuperVisor FROM                         TrainingProgram tp
+                                        JOIN EmployeeTraining et ON et.TrainingProgramId = tp.Id
+                                        JOIN Employee e ON e.Id = et.EmployeeId WHERE tp.Id = @id";
+
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
+
+                    SqlDataReader reader = await cmd.ExecuteReaderAsync();
+                    TrainingProgram trainingProgram = null;
+                    Employee employee = null;
+
+                    if (reader.Read())
+                    {
+                        trainingProgram = new TrainingProgram()
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            Name = reader.GetString(reader.GetOrdinal("Name")),
+                            StartDate = reader.GetDateTime(reader.GetOrdinal("StartDate")),
+                            EndDate = reader.GetDateTime(reader.GetOrdinal("EndDate")),
+                            MaxAttendees = reader.GetInt32(reader.GetOrdinal("MaxAttendees"))
+                        };
+                        employee = new Employee()
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                            LastName = reader.GetString(reader.GetOrdinal("LastName")),
+                            DepartmentId = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
+                            IsSuperVisor = reader.GetBoolean(reader.GetOrdinal("IsSuperVisor"))
+                        };
+                        trainingProgram.employees.Add(employee);
+                    }
+                    reader.Close();
+                    return Ok(trainingProgram);
+                }
+            }
         }
 
         // POST: api/TrainingProgram
@@ -114,6 +156,22 @@ namespace BangazonAPI.Controllers
         [HttpDelete("{id}")]
         public void Delete(int id)
         {
+        }
+
+        private bool TrainingProgramExists(int id)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = "SELECT Id FROM TrainingProgram WHERE Id = @id";
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
+
+                    SqlDataReader reader = cmd.ExecuteReader();
+                    return reader.Read();
+                }
+            }
         }
     }
 }
