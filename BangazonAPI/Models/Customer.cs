@@ -21,6 +21,12 @@ namespace BangazonAPI.Models
         [Required]
         public string LastName { get; set; }
 
+        // The ListOfProducts property is a public list of products that represents all the products of the customer
         public List<Product> ListOfProducts { get; set; } = new List<Product>();
+
+        // The ListOfPayments property is a public list of payment types that represents all the payment types that belong to the customer
+
+        public List<PaymentType> ListOfPaymentTypes { get; set; } = new List<PaymentType>();
+
     }
 }

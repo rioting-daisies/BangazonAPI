@@ -64,6 +64,14 @@ namespace BangazonAPI.Controllers
                
                 sql = "SELECT c.Id AS CustomerId, c.FirstName, c.LastName, p.Id AS ProductId, p.Price, p.Title, p.Description, p.Quantity, p.ProductTypeId FROM Customer c JOIN Product p ON p.CustomerId = c.Id";
             }
+            else if (_include == "payments")
+            {
+                sql = "SELECT c.Id AS CustomerId, c.FirstName, c.LastName, pt.Id AS PaymentTypeId, pt.AcctNumber, pt.Name, pt.CustomerId FROM Customer c JOIN PaymentType pt ON pt.CustomerId = c.Id";
+            }
+            else
+            {
+                return new StatusCodeResult(StatusCodes.Status400BadRequest);
+            }
 
             if (q != null)
             {
@@ -91,6 +99,7 @@ namespace BangazonAPI.Controllers
 
                     List<Customer> customers = new List<Customer>();
 
+                    List<PaymentType> payments = new List<PaymentType>();
                     
                     List<Product> products = new List<Product>();
                     
@@ -108,6 +117,8 @@ namespace BangazonAPI.Controllers
 
                         Product product = null;
 
+                        PaymentType payment = null;
+
                         if (_include == "products")
                         {
                             product = new Product
@@ -123,6 +134,18 @@ namespace BangazonAPI.Controllers
                             products.Add(product);
                         }
 
+                        if(_include == "payments")
+                        {
+                            payment = new PaymentType
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("PaymentTypeId")),
+                                AcctNumber = reader.GetInt32(reader.GetOrdinal("AcctNumber")),
+                                Name = reader.GetString(reader.GetOrdinal("Name")),
+                                CustomerId = reader.GetInt32(reader.GetOrdinal("CustomerId"))
+                            };
+                            payments.Add(payment);
+                        }
+
                         if(!customers.Any(c => c.Id == customer.Id))
                         {
                             customers.Add(customer);
@@ -131,6 +154,9 @@ namespace BangazonAPI.Controllers
                         {
                             customers.Find(c => c.Id == customer.Id).ListOfProducts = products.Where(p => p.CustomerId == customer.Id).ToList();
                                 
+                        } else if (_include == "payments")
+                        {
+                            customers.Find(c => c.Id == payment.CustomerId).ListOfPaymentTypes = payments.Where(p => p.CustomerId == customer.Id).ToList();
                         }
                         
                     }
