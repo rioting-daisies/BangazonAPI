@@ -1,4 +1,5 @@
-﻿//Author: Billy Mitchell
+﻿// Author: Billy Mitchell
+// The purpose fo the ProductType controller is to define the methods to be used for accessing the orders table in the BangazonAPI database GET PUT POST and DELETE 
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -195,7 +196,7 @@ namespace BangazonAPI.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT Id From ProductType where Id = @id";
+                    cmd.CommandText = @"SELECT Id FROM ProductType WHERE Id = @id";
                     cmd.Parameters.Add(new SqlParameter("@id", id));
 
                     SqlDataReader reader = cmd.ExecuteReader();
