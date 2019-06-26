@@ -53,11 +53,11 @@ namespace BangazonAPI.Controllers
         [HttpGet]
         public async Task<IActionResult> Get(string q, string _include)
         {
-            string sql = "";
+            string sql = @"SELECT c.Id AS CustomerId, c.FirstName, c.LastName FROM Customer c";
 
-            if(_include == null)
+            if (_include == null)
             {
-                sql = @"SELECT c.Id AS CustomerId, c.FirstName, c.LastName FROM Customer c";
+                sql = sql;
             }
             else if(_include == "products")
             {
@@ -67,6 +67,10 @@ namespace BangazonAPI.Controllers
             else if (_include == "payments")
             {
                 sql = "SELECT c.Id AS CustomerId, c.FirstName, c.LastName, pt.Id AS PaymentTypeId, pt.AcctNumber, pt.Name, pt.CustomerId FROM Customer c JOIN PaymentType pt ON pt.CustomerId = c.Id";
+            }
+            else if (_include == "payments" && _include=="products")
+            {
+                sql = "SELECT c.Id AS CustomerId, c.FirstName, c.LastName, p.Id AS ProductId, p.Price, p.Title, p.Description, p.Quantity, p.ProductTypeId, pt.Id AS PaymentTypeId, pt.AcctNumber, pt.Name, pt.CustomerId FROM Customer c JOIN Product p ON p.CustomerId = c.Id JOIN PaymentType pt ON pt.CustomerId = c.Id";
             }
             else
             {
@@ -150,11 +154,12 @@ namespace BangazonAPI.Controllers
                         {
                             customers.Add(customer);
                         }
-                        else if (_include == "products")
+                        if (_include == "products")
                         {
                             customers.Find(c => c.Id == customer.Id).ListOfProducts = products.Where(p => p.CustomerId == customer.Id).ToList();
                                 
-                        } else if (_include == "payments")
+                        }
+                        if (_include == "payments")
                         {
                             customers.Find(c => c.Id == payment.CustomerId).ListOfPaymentTypes = payments.Where(p => p.CustomerId == customer.Id).ToList();
                         }
@@ -178,9 +183,18 @@ namespace BangazonAPI.Controllers
         // GET api/Customer/5
         // This is the Get Customer by Id method that returns a single customer whose id = parameter Id obtained by the route. If no customer is found, a 404 status code is returned. 
         [HttpGet("{id}")]
-        public async Task<IActionResult> Get([FromRoute]int id)
+        public async Task<IActionResult> Get([FromRoute]int id, string _include)
         {
             string sql = @"SELECT c.Id AS CustomerId, c.FirstName, c.LastName FROM Customer c WHERE c.Id = @id";
+
+            if(_include == "products")
+            {
+                sql = "SELECT c.Id AS CustomerId, c.FirstName, c.LastName, p.Id AS ProductId, p.Price, p.Title, p.Description, p.Quantity, p.ProductTypeId FROM Customer c JOIN Product p ON p.CustomerId = c.Id WHERE c.Id = @id";
+            }
+            else if (_include == "payments")
+            {
+                sql = "SELECT c.Id AS CustomerId, c.FirstName, c.LastName, pt.Id AS PaymentTypeId, pt.AcctNumber, pt.Name, pt.CustomerId FROM Customer c JOIN PaymentType pt ON pt.CustomerId = c.Id WHERE c.Id = @id";
+            }
 
             using (SqlConnection conn = Connection)
             {
@@ -192,6 +206,9 @@ namespace BangazonAPI.Controllers
                     SqlDataReader reader = await cmd.ExecuteReaderAsync();
 
                     Customer customer = null;
+                    Dictionary<int, Product> products = new Dictionary<int, Product>();
+                    Dictionary<int, PaymentType> payments = new Dictionary<int, PaymentType>();
+
                     if (reader.Read())
                     {
                         customer = new Customer
@@ -201,6 +218,18 @@ namespace BangazonAPI.Controllers
                             LastName = reader.GetString(reader.GetOrdinal("LastName")),
                             // You might have more columns
                         };
+
+                        while(reader.Read())
+                        {
+                            if(_include == "products")
+                            {
+                               
+
+
+                            }
+
+                        }
+
                     }
 
                     reader.Close();
