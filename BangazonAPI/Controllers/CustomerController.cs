@@ -51,10 +51,18 @@ namespace BangazonAPI.Controllers
         // GET api/Customer
         // This method returns a list of all Customers in the database if no query paramter is input.
         [HttpGet]
-        public async Task<IActionResult> Get(string q)
+        public async Task<IActionResult> Get(string q, string _include)
         {
+            string sql = "";
 
-            string sql = @"SELECT c.Id AS CustomerId, c.FirstName, c.LastName FROM Customer c";
+            if(_include == null)
+            {
+                sql = @"SELECT c.Id AS CustomerId, c.FirstName, c.LastName FROM Customer c";
+            }
+            else
+            {
+                sql = "SELECT c.Id AS CustomerId, c.FirstName, c.LastName, p.Id AS ProductId, p.Price, p.Title, p.Description, p.Quantity FROM Customer c JOIN Product p ON p.CustomerId = c.Id";
+            }
 
             if (q != null)
             {
