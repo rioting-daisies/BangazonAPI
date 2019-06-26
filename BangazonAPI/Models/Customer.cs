@@ -20,5 +20,7 @@ namespace BangazonAPI.Models
         // The LastName property is a public string that is required when the Customer is created. This represents the last name of the customer
         [Required]
         public string LastName { get; set; }
+
+        public List<Product> ListOfProducts { get; set; } = new List<Product>();
     }
 }
