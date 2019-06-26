@@ -127,7 +127,7 @@ namespace BangazonAPI.Controllers
                         {
                             customers.Add(customer);
                         }
-                        else
+                        else if (_include == "products")
                         {
                             customers.Find(c => c.Id == customer.Id).ListOfProducts = products.Where(p => p.CustomerId == customer.Id).ToList();
                                 
