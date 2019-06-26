@@ -63,7 +63,7 @@ namespace BangazonAPI.Controllers
         // GET: api/Order/5
         // Method to get one Order entry in the database if no query parameter is inputed
         [HttpGet("{id}", Name = "GetOrder")]
-        public async Task<IActionResult> Get(int id)
+        public async Task<IActionResult> Get([FromRoute]int id)
         {
             if (!OrderExists(id))
             {
@@ -96,22 +96,102 @@ namespace BangazonAPI.Controllers
             }
         }
 
-        // POST: api/Order
+        // POST One Order Entry
         [HttpPost]
-        public void Post([FromBody] string value)
+        public async Task<IActionResult> Post([FromBody] Order order)
         {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"
+                        INSERT INTO [Order] (CustomerId, PaymentTypeId)
+                        OUTPUT INSERTED.Id
+                        VALUES (@CustomerId, @PaymentTypeId)";
+                    cmd.Parameters.Add(new SqlParameter("@CustomerId", order.CustomerId));
+                    cmd.Parameters.Add(new SqlParameter("@PaymentTypeId", order.PaymentTypeId));
+
+                    int NewId = (int)await cmd.ExecuteScalarAsync();
+                    order.Id = NewId;
+                    return CreatedAtRoute("GetOrder", new { id = NewId }, order);
+                }
+            }
         }
 
-        // PUT: api/Order/5
+        // PUT (update) One Order Entry
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public async Task<IActionResult> Put([FromRoute] int id, [FromBody] Order order)
         {
+            try
+            {
+                using (SqlConnection conn = Connection)
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = @"UPDATE [Order]
+                                            SET PaymentTypeId = @paymentTypeId                      
+                                            WHERE Id = @id";
+                        cmd.Parameters.Add(new SqlParameter("@paymentTypeId", order.PaymentTypeId));
+                        cmd.Parameters.Add(new SqlParameter("@id", id));
+
+                        int rowsAffected = await cmd.ExecuteNonQueryAsync();
+                        if (rowsAffected > 0)
+                        {
+                            return new StatusCodeResult(StatusCodes.Status204NoContent);
+                        }
+                        throw new Exception("No rows affected");
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                if (!OrderExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
         }
 
-        // DELETE: api/ApiWithActions/5
+        // DELETE One Product Type Entry
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public async Task<IActionResult> Delete([FromRoute] int id)
         {
+            try
+            {
+                using (SqlConnection conn = Connection)
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = @"DELETE FROM [Order] WHERE Id = @id";
+                        cmd.Parameters.Add(new SqlParameter("@id", id));
+
+                        int rowsAffected = await cmd.ExecuteNonQueryAsync();
+                        if (rowsAffected > 0)
+                        {
+                            return new StatusCodeResult(StatusCodes.Status204NoContent);
+                        }
+                        throw new Exception("No rows affected");
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                if (!OrderExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
         }
         //This method is used within the get by id, put, and delete methods to make sure the object exists.
         private bool OrderExists(int id)

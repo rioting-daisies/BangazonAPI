@@ -103,9 +103,10 @@ namespace BangazonAPI.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"INSERT INTO ProductType (Name)
-                                      Output INSERTED.Id
-                                      VALUES (@name)";
+                    cmd.CommandText = @"
+                        INSERT INTO ProductType (Name)
+                        OUTPUT INSERTED.Id
+                        VALUES (@name)";
                     cmd.Parameters.Add(new SqlParameter("@name", productType.Name));
 
                     int NewId = (int)await cmd.ExecuteScalarAsync();
