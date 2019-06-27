@@ -56,92 +56,87 @@ namespace TestBangazonAPI
                 Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
             }
         }
-        //Test to see if the POST and DELETE methods works for Products
+        //Test to see if the POST and DELETE methods works for Employees
         [Fact]
-        public async Task Test_Create_Delete_Product()
+        public async Task Test_Create_Delete_Employee()
         {
             using (var client = new APIClientProvider().Client)
             {
-                Product balloon = new Product
+                Employee person = new Employee
                 {
-                    ProductTypeId = 1,
-                    CustomerId = 1,
-                    Price = 55,
-                    Title = "Balloony",
-                    Description = "Floaty Thing",
-                    Quantity = 100
+                   FirstName = "Joe",
+                   LastName = "BillyBobSeamore",
+                   IsSuperVisor = true,
+                   DepartmentId = 1
                 };
-                var balloonAsJSON = JsonConvert.SerializeObject(balloon);
+                var personAsJSON = JsonConvert.SerializeObject(person);
 
                 var response = await client.PostAsync(
-                    "api/Product",
-                    new StringContent(balloonAsJSON, Encoding.UTF8, "application/json"));
+                    "api/Employee",
+                    new StringContent(personAsJSON, Encoding.UTF8, "application/json"));
 
                 string responseBody = await response.Content.ReadAsStringAsync();
-                var newballoon = JsonConvert.DeserializeObject<Product>(responseBody);
+                var newPerson = JsonConvert.DeserializeObject<Employee>(responseBody);
 
                 Assert.Equal(HttpStatusCode.Created, response.StatusCode);
-                Assert.Equal(1, newballoon.ProductTypeId);
-                Assert.Equal(1, newballoon.CustomerId);
-                Assert.Equal(55, newballoon.Price);
-                Assert.Equal("Balloony", newballoon.Title);
-                Assert.Equal("Floaty Thing", newballoon.Description);
-                Assert.Equal(100, newballoon.Quantity);
+                Assert.Equal("Joe", person.FirstName);
+                Assert.Equal("BillyBobSeamore", person.LastName);
+                Assert.Equal(1, person.DepartmentId);
+               
 
-                var deleteResponse = await client.DeleteAsync($"api/Product/{newballoon.Id}");
+                var deleteResponse = await client.DeleteAsync($"api/Employee/{person.Id}");
                 Assert.Equal(HttpStatusCode.NoContent, deleteResponse.StatusCode);
             }
         }
-        //Test to make sure when a nonexistant product id is entered to be deleted correct exception is thrown.
+        //Test to make sure when a nonexistant employee id is entered to be deleted correct exception is thrown.
         [Fact]
-        public async Task Test_Delete_NonExistent_Product_Fails()
+        public async Task Test_Delete_NonExistent_Employee_Fails()
         {
             using (var client = new APIClientProvider().Client)
             {
-                var deleteResponse = await client.DeleteAsync("api/Product/600000");
+                var deleteResponse = await client.DeleteAsync("api/Employee/600000");
 
                 Assert.False(deleteResponse.IsSuccessStatusCode);
                 Assert.Equal(HttpStatusCode.NotFound, deleteResponse.StatusCode);
             }
         }
-        //Test for PUT on product works for editing existing products
+        //Test for PUT on employee works for editing existing products
         [Fact]
         public async Task Test_Modify_Product()
         {
 
-            int newPrice = 222;
+            string NewFirstName = "Fiery";
 
             using (var client = new APIClientProvider().Client)
             {
 
-                Product modifiedVaccuum = new Product
+                Employee modifiedEmployee = new Employee
                 {
-                    ProductTypeId = 1,
-                    CustomerId = 1,
-                    Price = newPrice,
-                    Title = "Vaccuum of Destiny",
-                    Description = "Sucks you into your destiny. Youll prolly die oops.",
-                    Quantity = 2
+                    FirstName = NewFirstName,
+                    LastName = "Dragon",
+                    IsSuperVisor = true,
+                    DepartmentId = 1,
+                    
                 };
-                var modifiedVaccuumAsJSON = JsonConvert.SerializeObject(modifiedVaccuum);
+                var modifiedEmployeeASJSON = JsonConvert.SerializeObject(modifiedEmployee);
 
                 var response = await client.PutAsync(
-                    "api/Product/1",
-                    new StringContent(modifiedVaccuumAsJSON, Encoding.UTF8, "application/json")
+                    "api/Employee/1",
+                    new StringContent(modifiedEmployeeASJSON, Encoding.UTF8, "application/json")
                 );
                 string responseBody = await response.Content.ReadAsStringAsync();
 
                 Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
 
 
-                var getVaccuum = await client.GetAsync("api/Product/1");
-                getVaccuum.EnsureSuccessStatusCode();
+                var getEmployee = await client.GetAsync("api/Employee/1");
+                getEmployee.EnsureSuccessStatusCode();
 
-                string getVaccuumBody = await getVaccuum.Content.ReadAsStringAsync();
-                Product newVaccuum = JsonConvert.DeserializeObject<Product>(getVaccuumBody);
+                string getEmployeeBody = await getEmployee.Content.ReadAsStringAsync();
+                Employee newEmployee = JsonConvert.DeserializeObject<Employee>(getEmployeeBody);
 
-                Assert.Equal(HttpStatusCode.OK, getVaccuum.StatusCode);
-                Assert.Equal(newPrice, newVaccuum.Price);
+                Assert.Equal(HttpStatusCode.OK, getEmployee.StatusCode);
+                Assert.Equal(NewFirstName, newEmployee.FirstName);
             }
         }
         //Test to make sure that correct exception is thrown if you try to modify a non existant product
@@ -150,17 +145,15 @@ namespace TestBangazonAPI
         {
             using (var client = new APIClientProvider().Client)
             {
-                Product thing = new Product()
+                Employee thing = new Employee()
                 {
-                    CustomerId = 7,
-                    ProductTypeId = 22,
-                    Price = 3,
-                    Title = "NotRealThing",
-                    Description = "Not real thing test",
-                    Quantity = 2
+                    FirstName = "Blah",
+                    LastName = "Dragon",
+                    IsSuperVisor = true,
+                    DepartmentId = 1,
                 };
                 var thingASJSON = JsonConvert.SerializeObject(thing);
-                var editResponse = await client.PutAsync("api/Product/600000", new StringContent(thingASJSON, Encoding.UTF8, "application/json"));
+                var editResponse = await client.PutAsync("api/Employee/600000", new StringContent(thingASJSON, Encoding.UTF8, "application/json"));
 
                 Assert.False(editResponse.IsSuccessStatusCode);
                 Assert.Equal(HttpStatusCode.NotFound, editResponse.StatusCode);
