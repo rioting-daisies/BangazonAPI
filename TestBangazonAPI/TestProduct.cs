@@ -109,16 +109,14 @@ namespace TestBangazonAPI
         }
         //Test for PUT on product works for editing existing products
         [Fact]
-        public async Task Test_Modify_Customer()
+        public async Task Test_Modify_Product()
         {
-            // New last name to change to and test
+          
             int newPrice = 222;
 
             using (var client = new APIClientProvider().Client)
             {
-                /*
-                    PUT section
-                 */
+                
                 Product modifiedVaccuum = new Product
                 {
                     ProductTypeId = 1,
@@ -138,9 +136,7 @@ namespace TestBangazonAPI
 
                 Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
 
-                /*
-                    GET section
-                 */
+                
                 var getVaccuum = await client.GetAsync("api/Product/1");
                 getVaccuum.EnsureSuccessStatusCode();
 

@@ -177,5 +177,62 @@ namespace TestBangazonAPI
                 }
             }
         }
+
+        //Test for PUT on department works for editing existing departments
+        [Fact]
+        public async Task Test_Modify_Department()
+        {
+
+           
+
+            using (var client = new APIClientProvider().Client)
+            {
+                string newName = "HR";
+                Department modifiedHR = new Department
+                {
+                    Name = newName,
+                    Budget = 25000
+                };
+                var modifiedHRAsJSON = JsonConvert.SerializeObject(modifiedHR);
+
+                var response = await client.PutAsync(
+                    "api/Department/1",
+                    new StringContent(modifiedHRAsJSON, Encoding.UTF8, "application/json")
+                );
+                string responseBody = await response.Content.ReadAsStringAsync();
+
+                Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+
+
+                var getHR = await client.GetAsync("api/Department/1");
+                getHR.EnsureSuccessStatusCode();
+
+                List<Department> newHR = new List<Department>();
+                string getHRBody = await getHR.Content.ReadAsStringAsync();
+                 newHR = JsonConvert.DeserializeObject<List<Department>>(getHRBody);
+
+                Assert.Equal(HttpStatusCode.OK, getHR.StatusCode);
+                Assert.Equal(newName, newHR[0].Name);
+            }
+        }
+        //Test to make sure that correct exception is thrown if you try to modify a non existant department
+        [Fact]
+        public async Task Test_Edit_NonExistent_Department_Fails()
+        {
+            using (var client = new APIClientProvider().Client)
+            {
+                Department thing = new Department()
+                {
+                    Name = "DoomNGloom",
+                    Budget = 234234
+                    
+                };
+                var thingASJSON = JsonConvert.SerializeObject(thing);
+                var editResponse = await client.PutAsync("api/Department/600000", new StringContent(thingASJSON, Encoding.UTF8, "application/json"));
+
+                Assert.False(editResponse.IsSuccessStatusCode);
+                Assert.Equal(HttpStatusCode.NotFound, editResponse.StatusCode);
+            }
+        }
     }
 }

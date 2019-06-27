@@ -31,6 +31,8 @@ namespace BangazonAPI.Controllers
             }
         }
         // Get api/Department Getting all departments from database
+        // If string parameter _include=employees is used than all employees associated with each department is included as well
+        //If string parameter _filer_budget&_gt_integer than any department with a budget greater than the integer entered is gotten from Database
         [HttpGet]
         public async Task<IActionResult> Get(string _include, int? _gt)
 
@@ -108,6 +110,8 @@ namespace BangazonAPI.Controllers
         }
 
         // GET: api/Department/5 Getting one department by Id from database
+        // If string parameter _include=employees is used than all employees associated with targeted department is included as well
+        //If string parameter _filer_budget&_gt_integer than the department will only be gotten from the database if its budget is greater than the integer queried
 
         [HttpGet("{id}")]
         //[HttpGet("{id}", Name = "Get")]
@@ -223,11 +227,12 @@ namespace BangazonAPI.Controllers
                     {
                         cmd.CommandText = @"UPDATE Department
                                           SET Name = @Name,
-                                              Budget = @Budget,
+                                              Budget = @Budget
                                               WHERE Id = @id";
 
                         cmd.Parameters.Add(new SqlParameter("@Name", department.Name));
                         cmd.Parameters.Add(new SqlParameter("@Budget", department.Budget));
+                        cmd.Parameters.Add(new SqlParameter("@id", id));
 
                         int rowsAffected = await cmd.ExecuteNonQueryAsync();
                         if (rowsAffected > 0)
