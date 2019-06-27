@@ -250,6 +250,7 @@ namespace TestBangazonAPI
             }
         }
 
+        // Test_Get_AllCustomers_With_Products_And_qQuery is a test for the scenario where the user is querying the database with a Get call and wants to include all products that the customer is selling, and include 'q' to find specific customers whose first and last name properties that match the input in the query The route is api/Customer?_include=products&q=ser
         [Fact]
         public async Task Test_Get_AllCustomers_With_Products_And_qQuery()
         {
@@ -266,6 +267,26 @@ namespace TestBangazonAPI
                 Assert.Equal("Sermour", customers[0].FirstName);
                 Assert.Equal("Butts", customers[0].LastName);
                 Assert.True(customers[0].ListOfProducts.Count > 0);
+            }
+        }
+
+        // Test_Get_AllCustomers_With_PaymentTypes_And_qQuery is a test for the scenario where the user is querying the database with a Get call and wants to include all payment types of the customers, and include 'q' to find specific customers whose first and last name properties that match the input in the query The route is api/Customer?_include=payments&q=ser
+        [Fact]
+        public async Task Test_Get_AllCustomers_With_PaymentTypes_And_qQuery()
+        {
+            using (var client = new APIClientProvider().Client)
+            {
+                var response = await client.GetAsync("api/Customer?_include=payments&q=ser");
+
+                string responseBody = await response.Content.ReadAsStringAsync();
+
+                var customers = JsonConvert.DeserializeObject<List<Customer>>(responseBody);
+
+
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                Assert.Equal("Sermour", customers[0].FirstName);
+                Assert.Equal("Butts", customers[0].LastName);
+                Assert.True(customers[0].ListOfPaymentTypes.Count > 0);
             }
         }
 
