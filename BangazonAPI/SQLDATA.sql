@@ -45,6 +45,4 @@ SELECT * FROM TrainingProgram;
 
 
 
-INSERT INTO OrderProduct (OrderId, ProductId) VALUES (1, 1);
-
-
+-- INSERT INTO OrderProduct (OrderId, ProductId) VALUES (1, 1);

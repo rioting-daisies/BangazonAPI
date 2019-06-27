@@ -111,20 +111,20 @@ namespace BangazonAPI.Controllers
 
         [HttpGet("{id}")]
         //[HttpGet("{id}", Name = "Get")]
-        public async Task<IActionResult> Get(int id, string _include)
+        public async Task<IActionResult> Get(int id, string _include, int? _gt)
         {
             if (!DepartmentExists(id))
             {
                 return new StatusCodeResult(StatusCodes.Status404NotFound);
             }
-            string sql = "";
+            string sql = "SELECT Id, Name, Budget FROM Department";
 
-            if (_include == null)
+            if (_gt != null)
             {
-                sql = $"SELECT Id, Name, Budget FROM Department";
+                sql = $@"SELECT Id, Name, Budget FROM Department WHERE Budget > {_gt}";
             }
 
-            else if (_include != null)
+            if (_include != null)
             {
                 sql = @"SELECT d.Id AS Id, d.Name AS Name, d.Budget AS Budget, 
                             e.Id AS EmployeeId, e.FirstName AS FirstName, e.LastName AS LastName, e.DepartmentId AS Department
@@ -251,7 +251,41 @@ namespace BangazonAPI.Controllers
             }
         }
 
+        //DELETE api/department/1 Delete department from databased using Id as target value
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            try
+            {
+                using (SqlConnection conn = Connection)
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = @"DELETE FROM Department WHERE Id = @id";
+                        cmd.Parameters.Add(new SqlParameter("@id", id));
 
+                        int rowsAffected = await cmd.ExecuteNonQueryAsync();
+                        if (rowsAffected > 0)
+                        {
+                            return new StatusCodeResult(StatusCodes.Status204NoContent);
+                        }
+                        throw new Exception("No rows affected");
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                if (!DepartmentExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+        }
 
 
         //Method to check if Department with certain Id exists
