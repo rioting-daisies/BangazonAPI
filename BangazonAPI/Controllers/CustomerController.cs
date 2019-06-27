@@ -55,11 +55,7 @@ namespace BangazonAPI.Controllers
         {
             string sql = @"SELECT c.Id AS CustomerId, c.FirstName, c.LastName FROM Customer c";
 
-            if (_include == null)
-            {
-                sql = sql;
-            }
-            else if(_include == "products")
+            if(_include == "products")
             {
                
                 sql = "SELECT c.Id AS CustomerId, c.FirstName, c.LastName, p.Id AS ProductId, p.Price, p.Title, p.Description, p.Quantity, p.ProductTypeId FROM Customer c JOIN Product p ON p.CustomerId = c.Id";
@@ -68,11 +64,7 @@ namespace BangazonAPI.Controllers
             {
                 sql = "SELECT c.Id AS CustomerId, c.FirstName, c.LastName, pt.Id AS PaymentTypeId, pt.AcctNumber, pt.Name, pt.CustomerId FROM Customer c JOIN PaymentType pt ON pt.CustomerId = c.Id";
             }
-            else if (_include == "payments" && _include=="products")
-            {
-                sql = "SELECT c.Id AS CustomerId, c.FirstName, c.LastName, p.Id AS ProductId, p.Price, p.Title, p.Description, p.Quantity, p.ProductTypeId, pt.Id AS PaymentTypeId, pt.AcctNumber, pt.Name, pt.CustomerId FROM Customer c JOIN Product p ON p.CustomerId = c.Id JOIN PaymentType pt ON pt.CustomerId = c.Id";
-            }
-            else
+            else if (_include != null)
             {
                 return new StatusCodeResult(StatusCodes.Status400BadRequest);
             }
@@ -193,7 +185,7 @@ namespace BangazonAPI.Controllers
             }
             else if (_include == "payments")
             {
-                sql = "SELECT c.Id AS CustomerId, c.FirstName, c.LastName, pt.Id AS PaymentTypeId, pt.AcctNumber, pt.Name, pt.CustomerId FROM Customer c JOIN PaymentType pt ON pt.CustomerId = c.Id WHERE c.Id = @id";
+                sql = "SELECT c.Id AS CustomerId, c.FirstName, c.LastName, pt.Id AS PaymentTypeId, pt.AcctNumber, pt.Name, pt.CustomerId FROM Customer c JOIN PaymentType pt ON pt.CustomerId = c.Id WHERE pt.CustomerId = @id";
             }
 
             using (SqlConnection conn = Connection)
@@ -206,26 +198,78 @@ namespace BangazonAPI.Controllers
                     SqlDataReader reader = await cmd.ExecuteReaderAsync();
 
                     Customer customer = null;
-                    Dictionary<int, Product> products = new Dictionary<int, Product>();
-                    Dictionary<int, PaymentType> payments = new Dictionary<int, PaymentType>();
+                    List<Product> products = new List<Product>();
+                    List<PaymentType> payments = new List<PaymentType>();
 
                     if (reader.Read())
                     {
+
                         customer = new Customer
                         {
                             Id = reader.GetInt32(reader.GetOrdinal("CustomerId")),
                             FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
-                            LastName = reader.GetString(reader.GetOrdinal("LastName")),
-                            // You might have more columns
+                            LastName = reader.GetString(reader.GetOrdinal("LastName"))
                         };
 
+                        
+
+                        if(_include == "products")
+                        {
+                            Product product = new Product
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("ProductId")),
+                                ProductTypeId = reader.GetInt32(reader.GetOrdinal("ProductTypeId")),
+                                Title = reader.GetString(reader.GetOrdinal("Title")),
+                                Description = reader.GetString(reader.GetOrdinal("Description")),
+                                Quantity = reader.GetInt32(reader.GetOrdinal("Quantity"))
+                            };
+
+                            products.Add(product);
+                        }
+
+                        if(_include == "payments")
+                        {
+                            PaymentType payment = new PaymentType
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("PaymentTypeId")),
+                                AcctNumber = reader.GetInt32(reader.GetOrdinal("AcctNumber")),
+                                Name = reader.GetString(reader.GetOrdinal("Name")),
+                                CustomerId = reader.GetInt32(reader.GetOrdinal("CustomerId"))
+                            };
+                            payments.Add(payment);
+                        }
+                        
                         while(reader.Read())
                         {
                             if(_include == "products")
                             {
-                               
+                                Product product = new Product
+                                {
+                                    Id = reader.GetInt32(reader.GetOrdinal("ProductId")),
+                                    ProductTypeId = reader.GetInt32(reader.GetOrdinal("ProductTypeId")),
+                                    Title = reader.GetString(reader.GetOrdinal("Title")),
+                                    Description = reader.GetString(reader.GetOrdinal("Description")),
+                                    Quantity = reader.GetInt32(reader.GetOrdinal("Quantity"))
 
+                                };
 
+                                products.Add(product);
+
+                                customer.ListOfProducts = products;
+                            }
+
+                            if (_include == "payments")
+                            {
+                                PaymentType payment = new PaymentType
+                                {
+                                    Id = reader.GetInt32(reader.GetOrdinal("PaymentTypeId")),
+                                    AcctNumber = reader.GetInt32(reader.GetOrdinal("AcctNumber")),
+                                    Name = reader.GetString(reader.GetOrdinal("Name")),
+                                    CustomerId = reader.GetInt32(reader.GetOrdinal("CustomerId"))
+                                };
+                                payments.Add(payment);
+
+                                customer.ListOfPaymentTypes = payments;
                             }
 
                         }
