@@ -67,7 +67,15 @@ namespace TestBangazonAPI
                    FirstName = "Joe",
                    LastName = "BillyBobSeamore",
                    IsSuperVisor = true,
-                   DepartmentId = 1
+                   DepartmentId = 1,
+                   department = new Department
+                   {
+                       
+                           Id = 1,
+                           Name = "HR",
+                           Budget = 25000
+                       
+                   }
                 };
                 var personAsJSON = JsonConvert.SerializeObject(person);
 
@@ -84,7 +92,7 @@ namespace TestBangazonAPI
                 Assert.Equal(1, person.DepartmentId);
                
 
-                var deleteResponse = await client.DeleteAsync($"api/Employee/{person.Id}");
+                var deleteResponse = await client.DeleteAsync($"api/Employee/{newPerson.Id}");
                 Assert.Equal(HttpStatusCode.NoContent, deleteResponse.StatusCode);
             }
         }
