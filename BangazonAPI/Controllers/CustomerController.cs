@@ -197,6 +197,11 @@ namespace BangazonAPI.Controllers
                     cmd.Parameters.Add(new SqlParameter("@id", id));
                     SqlDataReader reader = await cmd.ExecuteReaderAsync();
 
+                    if(!CustomerExists(id))
+                    {
+                        return new StatusCodeResult(StatusCodes.Status404NotFound);
+                    }
+
                     Customer customer = null;
                     List<Product> products = new List<Product>();
                     List<PaymentType> payments = new List<PaymentType>();

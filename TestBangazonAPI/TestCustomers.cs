@@ -230,5 +230,23 @@ namespace TestBangazonAPI
                 Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
             }
         }
+
+        [Fact]
+        public async Task Test_Get_AllCustomers_With_Products()
+        {
+            using (var client = new APIClientProvider().Client)
+            {
+                var response = await client.GetAsync("api/Customer?_include=products");
+
+                string responseBody = await response.Content.ReadAsStringAsync();
+
+                var customers = JsonConvert.DeserializeObject<List<Customer>>(responseBody);
+                var products = JsonConvert.DeserializeObject<List<Product>>(responseBody);
+
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                Assert.True(customers.Count > 0);
+                Assert.True(products.Count > 0);
+            }
+        }
     }
 }
