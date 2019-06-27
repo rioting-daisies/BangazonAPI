@@ -42,10 +42,11 @@ namespace BangazonAPI.Controllers
                             e.FirstName,
                             e.LastName, 
                             e.DepartmentId, 
-                            e.IsSuperVisor 
+                            e.IsSuperVisor,
+                            et.EmployeeId AS etEmployeeId
                             FROM TrainingProgram tp
-                           JOIN EmployeeTraining et ON et.TrainingProgramId = tp.Id
-                           JOIN Employee e ON e.Id = et.EmployeeId";
+                          left JOIN EmployeeTraining et ON et.TrainingProgramId = tp.Id
+                          left JOIN Employee e ON e.Id = et.EmployeeId";
 
             if (completed == "false")
             {
@@ -68,6 +69,7 @@ namespace BangazonAPI.Controllers
 
                     var programs = new Dictionary<int, TrainingProgram>();
 
+                    Employee employee = null; 
 
                     while (reader.Read())
                     {
@@ -85,15 +87,29 @@ namespace BangazonAPI.Controllers
                             programs.Add(trainingProgram.Id, trainingProgram);
 
                         }
-                        Employee employee = new Employee()
+                        //string employeeName = reader.GetString(reader.GetOrdinal("FirstName"));
+
+                        //if (reader.GetString(reader.GetOrdinal("FirstName")) != null)
+                        //{
+                        try
                         {
-                            Id = reader.GetInt32(reader.GetOrdinal("employeeId")),
-                            FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
-                            LastName = reader.GetString(reader.GetOrdinal("LastName")),
-                            DepartmentId = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
-                            IsSuperVisor = reader.GetBoolean(reader.GetOrdinal("IsSuperVisor"))
-                        };
+                                employee = new Employee()
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("employeeId")),
+                                FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                                LastName = reader.GetString(reader.GetOrdinal("LastName")),
+                                DepartmentId = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
+                                IsSuperVisor = reader.GetBoolean(reader.GetOrdinal("IsSuperVisor"))
+                            };
                         programs[reader.GetInt32(reader.GetOrdinal("Id"))].employees.Add(employee);
+
+                        }
+                        catch (Exception)
+                        {
+                            employee = null;
+                        }
+
+                        //}
                         //trainingProgram.employees.Add(employee);
 
 
@@ -132,9 +148,19 @@ namespace BangazonAPI.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT tp.Id, tp.Name, tp.StartDate, tp.EndDate, tp.MaxAttendees, e.Id, e.FirstName, e.LastName, e.DepartmentId, e.IsSuperVisor FROM                         TrainingProgram tp
-                                        JOIN EmployeeTraining et ON et.TrainingProgramId = tp.Id
-                                        JOIN Employee e ON e.Id = et.EmployeeId WHERE tp.Id = @id";
+                    cmd.CommandText = @"SELECT tp.Id, 
+                                        tp.Name, 
+                                        tp.StartDate, 
+                                        tp.EndDate, 
+                                        tp.MaxAttendees, 
+                                        e.Id AS employeeId, 
+                                        e.FirstName, 
+                                        e.LastName, 
+                                        e.DepartmentId, 
+                                        e.IsSuperVisor FROM                         
+                                        TrainingProgram tp
+                                        left JOIN EmployeeTraining et ON et.TrainingProgramId = tp.Id
+                                        left JOIN Employee e ON e.Id = et.EmployeeId WHERE tp.Id = @id";
 
                     cmd.Parameters.Add(new SqlParameter("@id", id));
 
@@ -142,28 +168,50 @@ namespace BangazonAPI.Controllers
                     TrainingProgram trainingProgram = null;
                     Employee employee = null;
 
-                    if (reader.Read())
+                    var program = new Dictionary<int, TrainingProgram>();
+
+                    while (reader.Read())
                     {
-                        trainingProgram = new TrainingProgram()
+                        if (!program.ContainsKey(reader.GetInt32(reader.GetOrdinal("Id"))))
                         {
-                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                            Name = reader.GetString(reader.GetOrdinal("Name")),
-                            StartDate = reader.GetDateTime(reader.GetOrdinal("StartDate")),
-                            EndDate = reader.GetDateTime(reader.GetOrdinal("EndDate")),
-                            MaxAttendees = reader.GetInt32(reader.GetOrdinal("MaxAttendees"))
-                        };
+
+
+                            trainingProgram = new TrainingProgram()
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                Name = reader.GetString(reader.GetOrdinal("Name")),
+                                StartDate = reader.GetDateTime(reader.GetOrdinal("StartDate")),
+                                EndDate = reader.GetDateTime(reader.GetOrdinal("EndDate")),
+                                MaxAttendees = reader.GetInt32(reader.GetOrdinal("MaxAttendees"))
+                            };
+                            program.Add(trainingProgram.Id, trainingProgram);
+                        }
+
+                        try
+                        {
                         employee = new Employee()
                         {
-                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            Id = reader.GetInt32(reader.GetOrdinal("employeeId")),
                             FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
                             LastName = reader.GetString(reader.GetOrdinal("LastName")),
                             DepartmentId = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
                             IsSuperVisor = reader.GetBoolean(reader.GetOrdinal("IsSuperVisor"))
                         };
-                        trainingProgram.employees.Add(employee);
+                        program[reader.GetInt32(reader.GetOrdinal("Id"))].employees.Add(employee);
+
+                        }
+                        catch (Exception)
+                        {
+                            employee = null;
+                        }
+
+
+                        //trainingProgram.employees.Add(employee);
                     }
                     reader.Close();
-                    return Ok(trainingProgram);
+
+                    List<TrainingProgram> trainingPrograms1 = program.Values.ToList();
+                    return Ok(trainingPrograms1);
                 }
             }
         }
@@ -194,19 +242,87 @@ namespace BangazonAPI.Controllers
 
         // PUT: api/TrainingProgram/5
         [HttpPut("{id}")]
-        //public async Task<IActionResult> Put([FromRoute]int id, [FromBody] TrainingProgram trainingProgram)
-        //{
-        //    try
-        //    {
-        //        using
-        //    }
+        public async Task<IActionResult> Put([FromRoute]int id, [FromBody] TrainingProgram trainingProgram)
+        {
+            try
+            {
+                using (SqlConnection conn = Connection)
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = @"UPDATE TrainingProgram SET 
+                                            Name = @N, 
+                                            StartDate = @SD,
+                                            EndDate = @ED,
+                                            MaxAttendees = @MA
+                                            WHERE Id = @id";
 
-        //}
+                        cmd.Parameters.Add(new SqlParameter("@id", id));
+                        cmd.Parameters.Add(new SqlParameter("@N", trainingProgram.Name));
+                        cmd.Parameters.Add(new SqlParameter("@SD", trainingProgram.StartDate));
+                        cmd.Parameters.Add(new SqlParameter("@ED", trainingProgram.EndDate));
+                        cmd.Parameters.Add(new SqlParameter("@MA", trainingProgram.MaxAttendees));
+
+                        int rowAffected = await cmd.ExecuteNonQueryAsync();
+
+                        if (rowAffected > 0)
+                        {
+                            return new StatusCodeResult(StatusCodes.Status204NoContent);
+                        }
+                        throw new Exception("Did't work yo");
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                if (!TrainingProgramExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+        }
 
         // DELETE: api/ApiWithActions/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public async Task<IActionResult> Delete([FromRoute]int id)
         {
+            try
+            {
+                using (SqlConnection conn = Connection)
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = "DELETE FROM TrainingProgram WHERE Id = @id";
+
+                        cmd.Parameters.Add(new SqlParameter("@id", id));
+
+                        int rowAffected = await cmd.ExecuteNonQueryAsync();
+
+                        if (rowAffected > 0)
+                        {
+                            return new StatusCodeResult(StatusCodes.Status204NoContent);
+                        }
+                        throw new Exception("didnt work homes");
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                if (!TrainingProgramExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
         }
 
         private bool TrainingProgramExists(int id)
