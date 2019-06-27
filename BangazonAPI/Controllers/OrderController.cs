@@ -32,22 +32,36 @@ namespace BangazonAPI.Controllers
         // GET: api/Order
         // Method to get all Order entries in the database if no query parameter is inputed
         [HttpGet]
-        public async Task<IActionResult> Get(string _include)
+        public async Task<IActionResult> Get(string _include, string completed)
         {
             string sql = @"SELECT 
                             o.Id AS OrderId, o.CustomerId, o.PaymentTypeId,
-                            op.Id, op.OrderId, op.ProductId,
-                            p.Id, p.Price, p.Title, p.Description, p.Quantity, p.ProductTypeId, p.CustomerId,
+                            
+                            p.Id AS ProductId, p.Price, p.Title, p.Description, p.Quantity, p.ProductTypeId, p.CustomerId,
                             pt.Id, pt.Name,
                             c.Id, c.FirstName, c.LastName,
                             payt.Id, payt.AcctNumber, payt.Name, payt.CustomerId
                             FROM [Order] o
-                            JOIN OrderProduct op ON o.Id = op.OrderId
-                            JOIN Product p ON p.Id = op.ProductId
-                            JOIN ProductType pt ON pt.Id = p.ProductTypeId
-                            JOIN Customer c ON c.Id = o.CustomerId
-                            JOIN PaymentType payt ON payt.Id = o.PaymentTypeId
+                            LEFT JOIN OrderProduct op ON o.Id = op.OrderId
+                            LEFT JOIN Product p ON p.Id = op.ProductId
+                            LEFT JOIN ProductType pt ON pt.Id = p.ProductTypeId
+                            LEFT JOIN Customer c ON c.Id = o.CustomerId
+                            LEFT JOIN PaymentType payt ON payt.Id = o.PaymentTypeId
                             ";
+            // op.Id, op.OrderId, op.ProductId,
+
+            if (completed == "false")
+            {
+                sql += " WHERE o.PaymentTypeId IS NULL";
+            }
+            else if (completed == "true")
+            {
+                sql += " WHERE o.PaymentTypeId IS NOT NULL";
+            }
+            else if (completed != null)
+            {
+                return new StatusCodeResult(StatusCodes.Status400BadRequest);
+            }
 
          
             using (SqlConnection conn = Connection)
@@ -62,15 +76,23 @@ namespace BangazonAPI.Controllers
 
                     while (reader.Read())
                     {
-                        Order order = new Order()
-                        {
-                            Id = reader.GetInt32(reader.GetOrdinal("OrderId")),
-                            CustomerId = reader.GetInt32(reader.GetOrdinal("CustomerId")),
-                            PaymentTypeId = reader.GetInt32(reader.GetOrdinal("PaymentTypeId"))
-                        };
-                        Product product = null;                        
+                        Order order = null;
 
-                        if (_include == "products")
+                        order = new Order()
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("OrderId")),
+                                CustomerId = reader.GetInt32(reader.GetOrdinal("CustomerId"))
+                               //PaymentTypeId = null
+                            };
+                        if (!reader.IsDBNull(reader.GetOrdinal("PaymentTypeId")))
+                        {
+                            order.PaymentTypeId = reader.GetInt32(reader.GetOrdinal("PaymentTypeId"));
+                        }
+
+
+                        Product product = null;
+
+                        if (_include == "products" && !reader.IsDBNull(reader.GetOrdinal("ProductId")))
                         {
                             product = new Product
                             {
@@ -199,7 +221,7 @@ namespace BangazonAPI.Controllers
             }
         }
 
-        // DELETE One Product Type Entry
+        // DELETE One Order Entry and all Products associated with 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete([FromRoute] int id)
         {
