@@ -159,7 +159,7 @@ namespace BangazonAPI.Controllers
 
         //PUT api/product/5 Editing product from database using Product Id to target
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put([FromRoute] int id, [FromBody] Product product)
+        public async Task<IActionResult> Put([FromRoute] int id, [FromBody] Employee employee)
         {
             try
             {
@@ -168,22 +168,20 @@ namespace BangazonAPI.Controllers
                     conn.Open();
                     using (SqlCommand cmd = conn.CreateCommand())
                     {
-                        cmd.CommandText = @"UPDATE Product
-                                          SET ProductTypeId = @ProductTypeId,
-                                              CustomerId = @CustomerId,
-                                              Price = @Price,
-                                              Title = @Title,
-                                              Description = @Description,
-                                              Quantity = @Quantity
+                        cmd.CommandText = @"UPDATE Employee
+                                          SET FirstName = @FirstName,
+                                              LastName = @LastName,
+                                              DepartmentId = @DepartmentId,
+                                              IsSuperVisor = @IsSuperVisor
+                                              
+                                              
                                           WHERE Id = @id";
 
                         cmd.Parameters.Add(new SqlParameter("@id", id));
-                        cmd.Parameters.Add(new SqlParameter("@ProductTypeId", product.ProductTypeId));
-                        cmd.Parameters.Add(new SqlParameter("@CustomerId", product.CustomerId));
-                        cmd.Parameters.Add(new SqlParameter("@Price", product.Price));
-                        cmd.Parameters.Add(new SqlParameter("@Title", product.Title));
-                        cmd.Parameters.Add(new SqlParameter("@Description", product.Description));
-                        cmd.Parameters.Add(new SqlParameter("@Quantity", product.Quantity));
+                        cmd.Parameters.Add(new SqlParameter("@FirstName", employee.FirstName));
+                        cmd.Parameters.Add(new SqlParameter("@LastName", employee.LastName));
+                        cmd.Parameters.Add(new SqlParameter("@DepartmentId", employee.DepartmentId));
+                        cmd.Parameters.Add(new SqlParameter("@IsSuperVisor", employee.IsSuperVisor));
 
                         int rowsAffected = await cmd.ExecuteNonQueryAsync();
                         if (rowsAffected > 0)

@@ -159,6 +159,12 @@ namespace TestBangazonAPI
                     LastName = "Dragon",
                     IsSuperVisor = true,
                     DepartmentId = 1,
+                    department = new Department
+                    {
+                        Id = 1,
+                        Name = "HR",
+                        Budget = 25000
+                    }
                 };
                 var thingASJSON = JsonConvert.SerializeObject(thing);
                 var editResponse = await client.PutAsync("api/Employee/600000", new StringContent(thingASJSON, Encoding.UTF8, "application/json"));
