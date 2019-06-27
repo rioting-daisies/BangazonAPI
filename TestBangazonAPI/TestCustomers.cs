@@ -250,6 +250,25 @@ namespace TestBangazonAPI
             }
         }
 
+        [Fact]
+        public async Task Test_Get_AllCustomers_With_Products_And_qQuery()
+        {
+            using (var client = new APIClientProvider().Client)
+            {
+                var response = await client.GetAsync("api/Customer?_include=products&q=ser");
+
+                string responseBody = await response.Content.ReadAsStringAsync();
+
+                var customers = JsonConvert.DeserializeObject<List<Customer>>(responseBody);
+
+
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                Assert.Equal("Sermour", customers[0].FirstName);
+                Assert.Equal("Butts", customers[0].LastName);
+                Assert.True(customers[0].ListOfProducts.Count > 0);
+            }
+        }
+
         // Test_Get_AllCustomers_With_PaymentTypes is a test for the scenario where the user is querying the database with a Get call and wants to include all payment types that the customers have in the database. The route is api/Customer?_include=payments
         [Fact]
        public async Task Test_Get_AllCustomers_With_PaymentTypes()
@@ -268,6 +287,8 @@ namespace TestBangazonAPI
                 Assert.True(payments.Count > 0);
             }
         }
+
+        // Test_Get_CustomerById_With_PaymentTypes is a test for the scenario where the user is querying the database with a Get By Id and wants to include all payment types that the customer has in the database. The route is api/Customer/1?_include=payments
         [Fact]
         public async Task Test_Get_CustomerById_With_PaymentTypes()
         {
@@ -287,5 +308,29 @@ namespace TestBangazonAPI
                 Assert.NotNull(customer);
             }
         }
+
+
+        // Test_Get_CustomerById_With_Products is a test for the scenario where the user is querying the database with a Get By Id and wants to include all products that the customer has in the database. The route is api/Customer/1?_include=products
+        [Fact]
+        public async Task Test_Get_CustomerById_With_Products()
+        {
+            using (var client = new APIClientProvider().Client)
+            {
+                var response = await client.GetAsync("api/Customer/1?_include=products");
+
+                string responseBody = await response.Content.ReadAsStringAsync();
+                var customer = JsonConvert.DeserializeObject<Customer>(responseBody);
+
+                //var payments = JsonConvert.DeserializeObject<PaymentType>(responseBody);
+
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                Assert.Equal("Sermour", customer.FirstName);
+                Assert.Equal("Butts", customer.LastName);
+                Assert.True(customer.ListOfProducts.Count > 0);
+                Assert.NotNull(customer);
+            }
+        }
+
+
     }
 }
