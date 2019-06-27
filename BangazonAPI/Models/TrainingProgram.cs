@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -17,5 +18,17 @@ namespace BangazonAPI.Models
         public DateTime EndDate { get; set; }
         [Required]
         public int MaxAttendees { get; set; }
+        public List<Employee> employees { get; set; } = new List<Employee>();
+        //public string IsComplete()
+        //{
+        //    DateTime now = DateTime.Now;
+        //    if(StartDate >= now)
+        //    {
+        //        return "false";
+        //    } else
+        //    {
+        //        return "true";
+        //    }
+        //}
     }
 }
