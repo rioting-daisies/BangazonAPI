@@ -29,6 +29,8 @@ namespace BangazonAPI.Controllers
             }
         }
 
+        //gets all trainingPrograms and also list employees that are in the program. also allows query for completed, either true or false. if true the startdate is before today, if false the start date is in the future.  method inserts trainingprograms into dictionary, this allows multiply employees to be listed with one training program. if this isn't done then c# will duplicate the trainingprogram and only list one employee in the program. query requires two joins to access the join table between programs and employees
+
         // GET: api/TrainingProgram
         [HttpGet]
         public async Task<IActionResult> Get(string completed)
@@ -135,6 +137,8 @@ namespace BangazonAPI.Controllers
             }
         }
 
+        //very similar to get all training programs. this only brings one program base on id.  again a dictionary is needed so training programs are not duplicated if a program contains multiply employees. 
+
         // GET: api/TrainingProgram/5
         [HttpGet("{id}", Name = "GetTrainingProgram")]
         public async Task<IActionResult> Get([FromRoute]int id)
@@ -216,6 +220,8 @@ namespace BangazonAPI.Controllers
             }
         }
 
+        //allows post into trainingprogram resource
+
         // POST: api/TrainingProgram
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] TrainingProgram trainingProgram)
@@ -239,6 +245,8 @@ namespace BangazonAPI.Controllers
                 }
             }
         }
+
+        //allows edits for trainingprogram base on id
 
         // PUT: api/TrainingProgram/5
         [HttpPut("{id}")]
@@ -287,6 +295,8 @@ namespace BangazonAPI.Controllers
             }
         }
 
+        //allows deletes base on id
+
         // DELETE: api/ApiWithActions/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete([FromRoute]int id)
@@ -325,6 +335,8 @@ namespace BangazonAPI.Controllers
             }
         }
 
+        //returns bool based on if the trainingprogram exists, based on id that is input
+
         private bool TrainingProgramExists(int id)
         {
             using (SqlConnection conn = Connection)
@@ -342,3 +354,6 @@ namespace BangazonAPI.Controllers
         }
     }
 }
+
+
+//created by Alex for trainingprogram resource
