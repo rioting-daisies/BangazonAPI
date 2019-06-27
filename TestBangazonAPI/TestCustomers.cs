@@ -231,6 +231,7 @@ namespace TestBangazonAPI
             }
         }
 
+        // Test_Get_AllCustomers_With_Products is a test for the scenario where the user is querying the database with a Get call and wants to include all products that the customer is selling. The route is api/Customer?_include=products
         [Fact]
         public async Task Test_Get_AllCustomers_With_Products()
         {
@@ -241,15 +242,16 @@ namespace TestBangazonAPI
                 string responseBody = await response.Content.ReadAsStringAsync();
 
                 var customers = JsonConvert.DeserializeObject<List<Customer>>(responseBody);
-                var products = JsonConvert.DeserializeObject<List<Product>>(responseBody);
+                
 
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
                 Assert.True(customers.Count > 0);
-                Assert.True(products.Count > 0);
+                Assert.True(customers[0].ListOfProducts.Count > 0);
             }
         }
 
-       [Fact]
+        // Test_Get_AllCustomers_With_PaymentTypes is a test for the scenario where the user is querying the database with a Get call and wants to include all payment types that the customers have in the database. The route is api/Customer?_include=payments
+        [Fact]
        public async Task Test_Get_AllCustomers_With_PaymentTypes()
         {
             using (var client = new APIClientProvider().Client)
@@ -264,6 +266,25 @@ namespace TestBangazonAPI
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
                 Assert.True(customers.Count > 0);
                 Assert.True(payments.Count > 0);
+            }
+        }
+        [Fact]
+        public async Task Test_Get_CustomerById_With_PaymentTypes()
+        {
+            using (var client = new APIClientProvider().Client)
+            {
+                var response = await client.GetAsync("api/Customer/1?_include=payments");
+
+                string responseBody = await response.Content.ReadAsStringAsync();
+                var customer = JsonConvert.DeserializeObject<Customer>(responseBody);
+
+                //var payments = JsonConvert.DeserializeObject<PaymentType>(responseBody);
+
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                Assert.Equal("Sermour", customer.FirstName);
+                Assert.Equal("Butts", customer.LastName);
+                Assert.True(customer.ListOfPaymentTypes.Count > 0);
+                Assert.NotNull(customer);
             }
         }
     }
