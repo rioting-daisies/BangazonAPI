@@ -248,5 +248,23 @@ namespace TestBangazonAPI
                 Assert.True(products.Count > 0);
             }
         }
+
+       [Fact]
+       public async Task Test_Get_AllCustomers_With_PaymentTypes()
+        {
+            using (var client = new APIClientProvider().Client)
+            {
+                var response = await client.GetAsync("api/Customer?_include=payments");
+
+                string responseBody = await response.Content.ReadAsStringAsync();
+
+                var customers = JsonConvert.DeserializeObject<List<Customer>>(responseBody);
+                var payments = JsonConvert.DeserializeObject<List<PaymentType>>(responseBody);
+
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                Assert.True(customers.Count > 0);
+                Assert.True(payments.Count > 0);
+            }
+        }
     }
 }
