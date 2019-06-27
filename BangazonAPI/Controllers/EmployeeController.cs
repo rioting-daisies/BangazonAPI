@@ -36,9 +36,12 @@ namespace BangazonAPI.Controllers
             string sql = @"SELECT e.Id AS Id, 
                           e.FirstName AS FirstName, 
                             e.LastName AS LastName, 
-                            e.DepartmentId AS DepartmentId,
-                            e.IsSuperVisor AS IsSuperVisor 
-                          FROM Employee e
+                            e.DepartmentId AS EMPDepartmentId,
+                            e.IsSuperVisor AS IsSuperVisor,
+                            d.Name AS Name,
+                            d.Budget AS Budget,
+                            d.Id AS DepartmentId
+                            FROM Employee e
                           JOIN Department d ON e.DepartmentId = d.Id";
             using (SqlConnection conn = Connection)
             {
@@ -60,9 +63,9 @@ namespace BangazonAPI.Controllers
                             FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
                             LastName = reader.GetString(reader.GetOrdinal("LastName")),
                             department = new Department() {
-                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                                Name = reader.GetString(reader.GetOrdinal("d.Name")),
-                                Budget = reader.GetInt32(reader.GetOrdinal("d.Budget"))
+                                Id = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
+                                Name = reader.GetString(reader.GetOrdinal("Name")),
+                                Budget = reader.GetInt32(reader.GetOrdinal("Budget"))
                             }
                         };
                         employees.Add(employee);
@@ -86,9 +89,12 @@ namespace BangazonAPI.Controllers
             string sql = @"SELECT e.Id AS Id, 
                           e.FirstName AS FirstName, 
                             e.LastName AS LastName, 
-                            e.DepartmentId AS DepartmentId,
-                            e.IsSuperVisor AS IsSuperVisor
-                          FROM Employee e
+                            e.DepartmentId AS EMPDepartmentId,
+                            e.IsSuperVisor AS IsSuperVisor,
+                            d.Name AS Name,
+                            d.Budget AS Budget,
+                            d.Id AS DepartmentId
+                            FROM Employee e
                           JOIN Department d ON e.DepartmentId = d.Id WHERE e.Id = @id";
             using (SqlConnection conn = Connection)
             {
@@ -109,7 +115,7 @@ namespace BangazonAPI.Controllers
                             LastName = reader.GetString(reader.GetOrdinal("LastName")),
                             department = new Department()
                             {
-                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                Id = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
                                 Name = reader.GetString(reader.GetOrdinal("Name")),
                                 Budget = reader.GetInt32(reader.GetOrdinal("Budget"))
                             }
