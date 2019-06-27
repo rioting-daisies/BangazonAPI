@@ -1,8 +1,8 @@
-# Building the Bangazon Platform API
+# Bangazon
 
-Welcome, new Bangazonians!
+This is a .NET Web API that makes each resource in Bangazon available to application developers throughout the entire company.
 
-Your job is to build out a .NET Web API that makes each resource in the Bangazon ERD available to application developers throughout the entire company.
+The resources currently within the databases are:
 
 1. Products
 1. Product types
@@ -14,28 +14,78 @@ Your job is to build out a .NET Web API that makes each resource in the Bangazon
 1. Training programs
 1. Departments
 
-> **Pro tip:** You do not need to make a Controller for the join tables, because those aren't resources.
+## Getting Started
 
-Your product owner will provide you with a prioritized backlog of features for you to work on over the development sprint. The first version of the API will be completely open since we have not determined which authentication method we want to use yet.
+These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
 
-The only restriction on the API is that only requests from the `www.bangazon.com` domain should be allowed. Requests from that domain should be able to access every resource, and perform any operation a resource.
+1. `git clone git@github.com:rioting-daisies/BangazonAPI.git`
+2. You will be using the [Official Bangazon SQL](https://github.com/rioting-daisies/BangazonAPI/blob/master/bangazon.sql) file to create your database. Create the database using Azure Data Studio, create a new SQL script for that database, copy the contents of the SQL file into your script, and then execute it.
+3. Once the database is created, find the SQLDATA.sql file located in /BangazonAPI directory within the BangazonAPI.sln. Import this file into Azure Data Studio (or similar application) and run the insert queries in order from the top (i.e. start with INSERT INTO Customer on line 14 within the file).
+4. Run the SELECT statements at the very top after this in order to ensure that the tables have been populated with the correct data, which is referenced in the Unit Tests for each resource in the /TestBangazonAPI directory.
 
-## Plan
+### Prerequisites
 
-First, you need to plan. Your team needs to use the official SQL script (see below) and build a  Bangazon ERD using dbdiagram.io. Once your team agrees that the ERD is complete, you must get it approved by your manager before you begin writing code for the API.
+What things you need to install the software and how to install them:
+1. Visual Studio 2019 [click here to view installation instructions](https://visualstudio.microsoft.com/downloads/)
+2. Azure Data Studio [click here to view installation instructions](https://docs.microsoft.com/en-us/sql/azure-data-studio/download?view=sql-server-2017)
 
-## Modeling
+## Running the automated unit tests for all resources
 
-Next, you need to author the Models needed for your API. Make sure that each model has the approprate foreign key relationship defined on it, either with a custom type or an `List<T>` to store many related things. The boilerplate code shows you one example - the relationship between `Order` and `OrderProduct`, which is 1 -> &#8734;. For every _OrderId_, it can be stored in the `OrderProduct` table many times.
+1. Open the BangazonAPI.sln file within Visual Studio
+1. Check to make sure that the `IIS Express` is changed to `Bangazon API` within the dropdown menu of the Run (play arrow) button on your toolbar within Visual Studio.
+1. Begin automated tests by selecting `Test` on the toolbar, and then click `Run all tests` within Visual Studio.
 
-## Database Management
+## Running manual tests
+1. Open the BangazonAPI.sln file within Visual Studio.
+1. Check to make sure that the `IIS Express` is changed to `Bangazon API` within the dropdown menu of the Run (play arrow) button on your toolbar within Visual Studio. Now run the server by clicking the Run button.
+1. Open up your browser, and run the following links in order to make `GetAll` and `GetOne` requests for the resources:
+* `GetAll` [Payment Type](http://localhost:5000/api/paymenttype)
+* `GetOne` [Payment Type](http://localhost:5000/api/paymenttype/1)
+* `GetAll` [Customer](http://localhost:5000/api/customer)
+* `GetOne` [Customer](http://localhost:5000/api/customer/1)
+* `GetAll` [Customer with Products](http://localhost:5000/api/customer?_include=products)
+* `GetOne` [Customer with Products](http://localhost:5000/api/customer/1?_include=products)
+* `GetAll` [Customer with Payments](http://localhost:5000/api/customer?_include=payments)
+* `GetOne` [Customer with Payments](http://localhost:5000/api/customer/1?_include=payments)
+* `GetAll` [Customer with Query](http://localhost:5000/api/customer?q=ser)
+* `GetAll` [Customer with Products and Query](http://localhost:5000/api/customer?_include=products&q=ser)
+* `GetAll` [Customer with Payments and Query](http://localhost:5000/api/customer?_include=payments&q=ser)
+* `GetAll` [Product Type](http://localhost:5000/api/producttype)
+* `GetOne` [Product Type](http://localhost:5000/api/producttype/1)
+* `GetAll` [Product](http://localhost:5000/api/product)
+* `GetOne` [Product](http://localhost:5000/api/product/1)
+* `GetAll` [Order](http://localhost:5000/api/order)
+* `GetOne` [Order](http://localhost:5000/api/order/1)
+* `GetAll` [Order with Products](http://localhost:5000/api/order?_include=products)
+* `GetOne` [Order with Products](http://localhost:5000/api/order/1?_include=products)
+* `GetAll` [Order with Customers](http://localhost:5000/api/order?_include=customers)
+* `GetOne` [Order with Customers](http://localhost:5000/api/order?/1_include=customers)
+* `GetAll` [Non-Completed Orders](http://localhost:5000/api/order?completed=false)
+* `GetAll` [Completed Orders](http://localhost:5000/api/order?completed=true)
+* `GetAll` [Department](http://localhost:5000/api/department)
+* `GetOne` [Department](http://localhost:5000/api/department/1)
+* `GetAll` [Employees in Department](http://localhost:5000/api/department?_include=employees)
+* `GetOne` [Employees in Department](http://localhost:5000/api/department/1?_include=employees)
+* `GetAll` [Department with Budget Greater than $20,000](http://localhost:5000/api/department?_filter=budget&_gt=20000)
+* `GetOne` [Department with Budget Greater than $20,000](http://localhost:5000/api/department/1?_filter=budget&_gt=20000)
+* `GetAll` [Employee](http://localhost:5000/api/employee)
+* `GetOne` [Employee](http://localhost:5000/api/employee/1)
+* `GetAll` [Training Program](http://localhost:5000/api/trainingprogram)
+* `GetOne` [Training Program](http://localhost:5000/api/trainingprogram/1)
+* `GetAll` [Training Programs that are completed](http://localhost:5000/api/trainingprogram?completed=true)
+* `GetAll` [Training Programs that are not completed](http://localhost:5000/api/trainingprogram?completed=false)
+* `GetAll` [Computer](http://localhost:5000/api/computer)
+* `GetOne` [Computer](http://localhost:5000/api/computer/1)
+ 
 
-You will be using the [Official Bangazon SQL](./bangazon.sql) file to create your database. Create the database using SSMS, create a new SQL script for that database, copy the contents of the SQL file into your script, and then execute it.
+## Authors
 
-## Controllers
+* **Chris Morgan**
+* **Billy Mitchell**
+* **Clif Matuszewski**
+* **Alex Thacker**
 
-Now it's time to build the controllers that handle GET, POST, PUT, and DELETE operations on each resource. Make sure you read, and understand, the requirements in the issue tickets to you can use  SQL to return the correct data structure to client requests.
+## Acknowledgments
 
-## Test Classes
-
-Each feature ticket your team will work on for this sprint has testing requirements. This boilerplate solution has a testing project includes with some starter code. You must make sure that all tests pass before you submit a PR.
+* Hat tip to **Steve Brownley**, **Leah Hoefling**, and **Jisie David** for helping out throughout the project!
+* Kudos to **Andy Collins** for laying the c# foundation for us!
