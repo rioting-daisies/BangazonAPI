@@ -113,7 +113,7 @@ namespace TestBangazonAPI
         public async Task Test_Modify_Product()
         {
 
-            string NewFirstName = "Fiery";
+            string NewFirstName = "Firey";
 
             using (var client = new APIClientProvider().Client)
             {
@@ -124,6 +124,12 @@ namespace TestBangazonAPI
                     LastName = "Dragon",
                     IsSuperVisor = true,
                     DepartmentId = 1,
+                    department = new Department
+                    {
+                        Id = 1,
+                        Name = "HR",
+                        Budget = 25000
+                    }
                     
                 };
                 var modifiedEmployeeASJSON = JsonConvert.SerializeObject(modifiedEmployee);
