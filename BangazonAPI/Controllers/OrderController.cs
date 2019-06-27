@@ -1,5 +1,5 @@
 ﻿// Author: Billy Mitchell
-// The purpose fo the Order controller is to define the methods to be used for accessing the orders table in the BangazonAPI database GET PUT POST and DELETE  
+// The purpose for the Order controller is to define the methods to be used for accessing all tables associated with an order in the BangazonAPI database.
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 
 namespace BangazonAPI.Controllers
-{   // Setting the default route, api/producttype, 
+{   // Setting the default route, api/order 
     [Route("api/[controller]")]
     [ApiController]
     public class OrderController : ControllerBase
