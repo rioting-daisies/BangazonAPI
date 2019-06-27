@@ -32,9 +32,24 @@ namespace BangazonAPI.Controllers
         // GET: api/Order
         // Method to get all Order entries in the database if no query parameter is inputed
         [HttpGet]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> Get(string _include)
         {
-            string sql = @"SELECT Id AS OrderId, CustomerId, PaymentTypeId FROM [Order]";
+            string sql = @"SELECT 
+                            o.Id AS OrderId, o.CustomerId, o.PaymentTypeId,
+                            op.Id, op.OrderId, op.ProductId,
+                            p.Id, p.Price, p.Title, p.Description, p.Quantity, p.ProductTypeId, p.CustomerId,
+                            pt.Id, pt.Name,
+                            c.Id, c.FirstName, c.LastName,
+                            payt.Id, payt.AcctNumber, payt.Name, payt.CustomerId
+                            FROM [Order] o
+                            JOIN OrderProduct op ON o.Id = op.OrderId
+                            JOIN Product p ON p.Id = op.ProductId
+                            JOIN ProductType pt ON pt.Id = p.ProductTypeId
+                            JOIN Customer c ON c.Id = o.CustomerId
+                            JOIN PaymentType payt ON payt.Id = o.PaymentTypeId
+                            ";
+
+         
             using (SqlConnection conn = Connection)
             {
                 conn.Open();
@@ -43,6 +58,7 @@ namespace BangazonAPI.Controllers
                     cmd.CommandText = sql;
                     SqlDataReader reader = await cmd.ExecuteReaderAsync();
                     List<Order> orders = new List<Order>();
+                    List<Product> products = new List<Product>();
 
                     while (reader.Read())
                     {
@@ -52,7 +68,32 @@ namespace BangazonAPI.Controllers
                             CustomerId = reader.GetInt32(reader.GetOrdinal("CustomerId")),
                             PaymentTypeId = reader.GetInt32(reader.GetOrdinal("PaymentTypeId"))
                         };
-                        orders.Add(order);
+                        Product product = null;                        
+
+                        if (_include == "products")
+                        {
+                            product = new Product
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("ProductId")),
+                                ProductTypeId = reader.GetInt32(reader.GetOrdinal("ProductTypeId")),
+                                CustomerId = reader.GetInt32(reader.GetOrdinal("CustomerId")),
+                                Price = reader.GetDecimal(reader.GetOrdinal("Price")),
+                                Title = reader.GetString(reader.GetOrdinal("Title")),
+                                Description = reader.GetString(reader.GetOrdinal("Description")),
+                                Quantity = reader.GetInt32(reader.GetOrdinal("Quantity"))
+                            };
+                            products.Add(product);
+                        }
+                        if (!orders.Any(o => o.Id == order.Id))
+                        {
+                            orders.Add(order); 
+                        }
+
+                        if (_include == "products")
+                        {
+                            orders.Find(o => o.Id == order.Id).ListOfProducts = products.Where(p => p.CustomerId == order.Id).ToList();
+                        }                       
+
                     }
                     reader.Close();
                     return Ok(orders);

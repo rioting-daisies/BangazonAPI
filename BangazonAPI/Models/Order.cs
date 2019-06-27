@@ -17,5 +17,7 @@ namespace BangazonAPI.Models
         public int CustomerId { get; set; }
         // Gets and sets the customer's payment type through the Id associated with their payment account.
         public int PaymentTypeId { get; set; }
+        // Creates a list to for products
+        public List<Product> ListOfProducts { get; set; } = new List<Product>();
     }
 }
