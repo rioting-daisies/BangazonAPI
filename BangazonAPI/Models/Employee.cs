@@ -21,5 +21,7 @@ namespace BangazonAPI.Models
 
         [Required]
         public bool IsSuperVisor { get; set; }
+        [Required]
+        public Department department { get; set; } = new Department();
     }
 }

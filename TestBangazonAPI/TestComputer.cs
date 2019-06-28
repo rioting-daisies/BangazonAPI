@@ -66,7 +66,7 @@ namespace TestBangazonAPI
                 {
                     PurchaseDate = new DateTime(2018, 6, 27),
                     DecomissionDate = new DateTime(2019, 6, 26),
-                    Make = "Tecra",
+                    Make = "Latitude",
                     Manufacturer = "Toshiba"
                 };
                 var toshibaAsJSON = JsonConvert.SerializeObject(toshiba);
@@ -79,7 +79,7 @@ namespace TestBangazonAPI
                 var newToshiba = JsonConvert.DeserializeObject<Computer>(responseBody);
 
                 Assert.Equal(HttpStatusCode.Created, response.StatusCode);
-                Assert.Equal("Tecra", toshiba.Make);
+                Assert.Equal("Latitude", toshiba.Make);
                 Assert.Equal("Toshiba", toshiba.Manufacturer);
                 
 
@@ -99,9 +99,9 @@ namespace TestBangazonAPI
                 Assert.Equal(HttpStatusCode.NotFound, deleteResponse.StatusCode);
             }
         }
-        //Test for PUT on product works for editing existing products
+        //Test for PUT on computer works for editing existing products
         [Fact]
-        public async Task Test_Modify_Product()
+        public async Task Test_Modify_Computer()
         {
 
             String newManufacturer = "Dell";
@@ -113,7 +113,7 @@ namespace TestBangazonAPI
                 {
                     PurchaseDate = new DateTime(2018, 6, 27),
                     DecomissionDate = new DateTime(2019, 6, 26),
-                    Make = "Tecra",
+                    Make = "Latitude",
                     Manufacturer = newManufacturer
                 };
                 var modifiedComputerAsJSON = JsonConvert.SerializeObject(modifiedComputer);
