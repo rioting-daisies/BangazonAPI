@@ -113,7 +113,7 @@ namespace BangazonAPI.Controllers
 
                         if (_include == "products")
                         {
-                            orders.Find(o => o.Id == order.Id).ListOfProducts = products.Where(p => p.CustomerId == order.Id).ToList();
+                            orders.Find(o => o.Id == order.Id).ListOfProducts = products.Where(p => p.CustomerId == order.Id).ToArray();
                         }                       
 
                     }
@@ -161,23 +161,35 @@ namespace BangazonAPI.Controllers
 
         // POST One Order Entry
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] Order order)
+        public async Task<IActionResult> Post([FromBody] Order order) // , Product product
         {
             using (SqlConnection conn = Connection)
             {
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
+
+
+
                     cmd.CommandText = @"
                         INSERT INTO [Order] (CustomerId, PaymentTypeId)
                         OUTPUT INSERTED.Id
-                        VALUES (@CustomerId, @PaymentTypeId)";
+                        VALUES (@CustomerId, @PaymentTypeId)  
+                        INSERT INTO OrderProduct(OrderId, ProductId)
+                        OUTPUT INSERTED.Id
+                        VALUES(@OrderId, @ProductId)
+                        ";                       
+
+
                     cmd.Parameters.Add(new SqlParameter("@CustomerId", order.CustomerId));
                     cmd.Parameters.Add(new SqlParameter("@PaymentTypeId", order.PaymentTypeId));
+                    cmd.Parameters.Add(new SqlParameter("@OrderId", order.Id));
+                    cmd.Parameters.Add(new SqlParameter("@ProductId", 2));
 
                     int NewId = (int)await cmd.ExecuteScalarAsync();
                     order.Id = NewId;
                     return CreatedAtRoute("GetOrder", new { id = NewId }, order);
+
                 }
             }
         }
@@ -232,7 +244,8 @@ namespace BangazonAPI.Controllers
                     conn.Open();
                     using (SqlCommand cmd = conn.CreateCommand())
                     {
-                        cmd.CommandText = @"DELETE FROM [Order] WHERE Id = @id";
+                        cmd.CommandText = @"DELETE FROM OrderProduct WHERE OrderId = @id
+                                            DELETE FROM [Order] WHERE Id = @id";
                         cmd.Parameters.Add(new SqlParameter("@id", id));
 
                         int rowsAffected = await cmd.ExecuteNonQueryAsync();

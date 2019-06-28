@@ -75,7 +75,7 @@ namespace TestBangazonAPI
                 Order order = new Order
                 {
                     CustomerId = 1,
-                    PaymentTypeId = 2
+                    PaymentTypeId = 2                    
                 };
                 var orderAsJSON = JsonConvert.SerializeObject(order);
 

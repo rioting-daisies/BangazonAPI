@@ -1,4 +1,5 @@
 ﻿// Author: Billy Mitchell
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -18,6 +19,7 @@ namespace BangazonAPI.Models
         // Gets and sets the customer's payment type through the Id associated with their payment account.
         public int? PaymentTypeId { get; set; }
         // Creates a list to for products
-        public List<Product> ListOfProducts { get; set; } = new List<Product>();
+        
+        public Product[] ListOfProducts { get; set; }
     }
 }
